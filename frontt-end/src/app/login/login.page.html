@@ -1,0 +1,28 @@
+<div class="login-clean">
+    <form class="formauth" method="post" name="login">
+        <h2 class="sr-only">Login Form</h2>
+        <div class="illustration">
+          <img data-bs-hover-animate="pulse" src="assets/img/logo.png">
+        </div>
+        <h4>Login</h4>
+        <div class="form-group">
+          <input class="form-control form-control-sm" type="email" name="email" placeholder="Email" required minlength="3">
+        </div>
+        <div class="form-group">
+          <input class="form-control form-control-sm" type="password" name="password" placeholder="Password" required minlength="3"></div>
+        <div class="form-group">
+          <button class="btn btn-primary btn-block" data-bs-hover-animate="pulse" type="submit" style="border-radius: 20px;">Log In</button>
+        </div>
+        <div class="alert alert-danger d-none" role="alert" style="font-size: 13px;">
+          <span style="line-height: 1px;">Incorrect username or password !</span>
+        </div>
+  
+        <a class="forgot" href="">Forgot your password?</a>
+        <a class="forgot" href="" style="margin-top: 10px;">Don't have an account yet?</a>
+  
+        <div class="form-group">
+          <button class="btn btn-primary btn-block" type="button" >Authenticate with <strong>Google</strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<i class="fab fa-google"></i></button>
+          <button class="btn btn-primary btn-block" type="button" style="margin-top: 12px;background: var(--blue);">Authenticate with <strong>Facebook</strong>&nbsp; &nbsp; &nbsp; &nbsp;<i class="fab fa-facebook"></i></button>
+        </div>
+    </form>
+  </div>

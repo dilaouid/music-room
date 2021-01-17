@@ -3,6 +3,7 @@
   position: absolute;
   padding-top: 3vh;
   width: 100%;
+  border-radius: 4px;
 }
 
 .login-clean form {
@@ -11,7 +12,6 @@
   margin: 0 auto;
   background-color: #ffffff;
   padding: 40px;
-  border-radius: 4px;
   color: #505e6c;
   box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
 }
@@ -42,7 +42,7 @@
 }
 
 .login-clean input {
-  border-radius: 20px;
+  
 }
 
 .login-clean button {

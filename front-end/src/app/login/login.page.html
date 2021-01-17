@@ -6,10 +6,10 @@
         </div>
         <h4>Login</h4>
         <div class="form-group">
-          <input class="form-control form-control-sm" type="email" name="email" placeholder="Email" required minlength="3">
+          <input style="border-radius: 20px;" class="form-control form-control-sm" type="email" name="email" placeholder="Email" required minlength="3" #email (input)='inputTextField(email.value)'>
         </div>
         <div class="form-group">
-          <input class="form-control form-control-sm" type="password" name="password" placeholder="Password" required minlength="3"></div>
+          <input style="border-radius: 20px;" class="form-control form-control-sm" type="password" name="password" placeholder="Password" required minlength="3" #password (input)='inputTextField(password.value)'></div>
         <div class="form-group">
           <button class="btn btn-primary btn-block" data-bs-hover-animate="pulse" type="submit" style="border-radius: 20px;">Log In</button>
         </div>

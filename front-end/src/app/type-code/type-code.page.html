@@ -1,0 +1,23 @@
+<ion-content>
+  <div class="login-clean">
+    <form method="post">
+        <h2 class="sr-only">Login Form</h2>
+        <div class="illustration">
+          <img data-bs-hover-animate="pulse" src="assets/img/logo.png">
+        </div>
+        <h4>Check code</h4>
+        <p class="text-center text-black-50" style="font-size: 11px;opacity: 0.93;">You said you forgot your password? So you obviously received a mail, right? Within this mail, you have a code, please type it here in order to receive the access to create a new password for your account !</p>
+        <div class="form-group">
+          <input class="form-control form-control-sm" type="text" style="border-radius: 20px;" placeholder="Code" name="code" required #code (input)='inputTextField(code.value)'></div>
+        <div class="alert alert-info d-none" role="alert" style="border-radius: 20px;font-size: 13px;">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+          <span style="font-size: 10px;">A code has been sent to the email address. Please keep the code in order to renew your password!</span>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary btn-block" data-bs-hover-animate="pulse" type="submit" style="border-radius: 20px;margin-bottom: 1px;">Now I want my new password !</button>
+        </div>
+        <a class="forgot" href="/forgot-password">Oops, I haven't asked for the code yet!</a>
+        <a class="forgot" href="/login" style="margin-top: 14px;">Return to login</a>
+    </form>
+</div>
+</ion-content>

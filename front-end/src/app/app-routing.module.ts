@@ -11,9 +11,21 @@ const routes: Routes = [
     loadChildren: () => import('./register/register.module').then( m => m.RegisterPageModule)
   },
   {
+    path: 'forgot-password',
+    loadChildren: () => import('./forgot-password/forgot-password.module').then( m => m.ForgotPasswordPageModule)
+  },
+  {
+    path: 'new-password',
+    loadChildren: () => import('./new-password/new-password.module').then( m => m.NewPasswordPageModule)
+  },
+  {
+    path: 'type-code',
+    loadChildren: () => import('./type-code/type-code.module').then( m => m.TypeCodePageModule)
+  },
+  {
     path: '',
     loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
-  }
+  },
 ];
 @NgModule({
   imports: [

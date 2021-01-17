@@ -5,32 +5,32 @@
         <div class="illustration"><img data-bs-hover-animate="pulse" src="assets/img/logo.png"></div>
         <h4 style="text-align: center;margin-top: -15px;margin-bottom: 24px;opacity: 0.77;">Registration</h4>
         <div class="form-group">
-          <input class="form-control form-control-sm" type="text" name="username" placeholder="Username" style="border-radius: 20px;">
+          <input class="form-control form-control-sm" type="text" name="username" placeholder="Username" style="border-radius: 20px;" #username (input)='inputTextField(username.value)'>
         </div>
         <div class="form-group">
-          <input class="form-control form-control-sm" type="email" name="email" placeholder="Email" style="border-radius: 20px;">
+          <input class="form-control form-control-sm" type="email" name="email" placeholder="Email" style="border-radius: 20px;"  #email (input)='inputTextField(email.value)'>
         </div>
         <div class="form-group">
-          <input class="form-control form-control-sm" type="password" name="password" placeholder="Password" style="border-radius: 20px;">
+          <input class="form-control form-control-sm" type="password" name="password" placeholder="Password" style="border-radius: 20px;" #password (input)='inputTextField(password.value)'>
         </div>
         <div class="form-group">
-          <input class="form-control form-control-sm" type="password" name="confirm-password" placeholder="Confirm password" style="border-radius: 20px;">
+          <input class="form-control form-control-sm" type="password" name="confirm-password" placeholder="Confirm password" style="border-radius: 20px;"  #confirm-password (input)='inputTextField(confirm-password.value)'>
         </div>
         <div class="form-group">
           <label style="margin-bottom: 1px;font-size: 13px;width: 100%;text-align: center;">Date of birth</label>
             <div class="form-check-inline" style="width: 100%;margin-bottom: -19px;"><select class="custom-select" style="border-radius: 28px;width: 67px;font-size: 12px;" name="dd" value="01">
-                    <option value="01" selected="">01</option>
+                    <option value="01" selected>01</option>
                 </select><select class="custom-select" style="border-radius: 28px;width: 67px;font-size: 12px;margin: 15px;" name="mm" value="01">
-                    <option value="01" selected="">01</option>
+                    <option value="01" selected>01</option>
                 </select><select class="custom-select" style="border-radius: 28px;width: 75px;font-size: 12px;" name="yy" value="1940">
-                    <option value="1940" selected="">1940</option>
+                    <option value="1940" selected>1940</option>
                 </select></div>
         </div>
         <div class="form-group">
           <button class="btn btn-primary btn-block" data-bs-hover-animate="pulse" type="submit" style="border-radius: 20px;font-size: 11px;">Join 10H !</button>
         </div>
-        <div class="alert alert-danger d-none pulse animated" role="alert" style="font-size: 13px;border-radius: 20px;">
-          <span style="line-height: 1px;">Incorrect username or password !</span>
+        <div class="alert d-none pulse" role="alert" style="font-size: 13px;border-radius: 20px;">
+          <span style="line-height: 1px;"></span>
         </div>
         <a href="/login" class="forgot" style="margin-top: 10px;">Already have an account?</a>
     </form>

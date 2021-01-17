@@ -1,6 +1,6 @@
 .login-clean {
   z-index: 1;
-  position: absolute;
+  position: relative;
   padding-top: 3vh;
   width: 100%;
   border-radius: 4px;
@@ -12,8 +12,12 @@
   margin: 0 auto;
   background-color: #ffffff;
   padding: 40px;
+  margin-bottom: 50px;
   color: #505e6c;
   box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+  width: 319px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.82);
 }
 
 .login-clean .illustration {

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoginPage } from './login.page';
 
+import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 import { LoginPageRoutingModule } from './login-routing.module';
 
 @NgModule({
@@ -11,7 +12,8 @@ import { LoginPageRoutingModule } from './login-routing.module';
     IonicModule,
     CommonModule,
     FormsModule,
-    LoginPageRoutingModule
+    LoginPageRoutingModule,
+    ExploreContainerComponentModule
   ],
   declarations: [LoginPage]
 })

@@ -1,3 +1,4 @@
+<ion-content [scrollEvents]="true">
 <div class="login-clean">
     <form class="formauth" method="post" name="login">
         <h2 class="sr-only">Login Form</h2>
@@ -17,12 +18,13 @@
           <span id="alertmsg" style="line-height: 1px;"></span>
         </div>
         
-        <a class="forgot" href="">Forgot your password?</a>
-        <a class="forgot" href="" style="margin-top: 10px;">Don't have an account yet?</a>
-  
+        <a class="forgot" >Forgot your password?</a>
+        <a class="forgot" (click)="goToRegister()" style="margin-top: 10px;">Don't have an account yet?</a>
+
         <div class="form-group">
           <button class="btn btn-primary btn-block" type="button" >Authenticate with <strong>Google</strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<i class="fab fa-google"></i></button>
           <button class="btn btn-primary btn-block" type="button" style="margin-top: 12px;background: var(--blue);">Authenticate with <strong>Facebook</strong>&nbsp; &nbsp; &nbsp; &nbsp;<i class="fab fa-facebook"></i></button>
         </div>
     </form>
   </div>
+  </ion-content>

@@ -6,7 +6,6 @@ import { IonicModule } from '@ionic/angular';
 
 import { RegisterPageRoutingModule } from './register-routing.module';
 
-import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 import { RegisterPage } from './register.page';
 
 @NgModule({
@@ -14,8 +13,7 @@ import { RegisterPage } from './register.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    RegisterPageRoutingModule,
-    ExploreContainerComponentModule
+    RegisterPageRoutingModule
   ],
   declarations: [RegisterPage]
 })

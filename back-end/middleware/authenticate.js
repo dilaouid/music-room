@@ -43,7 +43,7 @@ router.post('/login', (req, res) => {
         bcrypt.compare(password, user.password).then(match => {
             if (match) {
                 const payload = {id: user.id};
-                jwt.sign(payload, keys.secretKey, {expiresIn: 31556926}, (err, token) => {
+                jwt.sign(payload, process.env.SECRET, {expiresIn: 31556926}, (err, token) => {
                     if (!err) {
                         res.cookie('token', token, { maxAge: 2 * 60 * 60 * 1000, domain: 'localhost', secure: false, sameSite: true, httpOnly: false });
                         return res.json({statut: 200, msg: null});

@@ -78,8 +78,8 @@ router.post('/register', (req, res) => {
                 let token = ( (+new Date) + Math.random() * 142).toString(32);
                 let hashtoken = crypto.createHash('sha384').update(token).digest('hex');
                 const parts = req.body.birthday.split('/').map((p) => parseInt(p, 10));
-                parts[0] -= 1;
-                const formatBirthday = new Date(parts[2], parts[0], parts[1]);
+                parts[1] -= 1;
+                const formatBirthday = new Date(parts[2], parts[1], parts[0]);
                 const registeredUser = new User({
                     username: sanitize(req.body.username),
                     email: sanitize(req.body.email),

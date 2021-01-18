@@ -98,7 +98,7 @@ router.post('/register', (req, res) => {
                                     const userFind = await User.findOne({_id: user.id});
                                     /* if (userFind) {
                                         // Immediately logs after registration, to delete after test
-                                        jwt.sign( { id: userFind._id } , keys.SECRET, { expiresIn: 31556926, algorithm: 'HS256' }, (err, tok) => {
+                                        jwt.sign( { id: userFind._id } , process.env.SECRET, { expiresIn: 31556926, algorithm: 'HS256' }, (err, tok) => {
                                             if (!err) {
                                                 res.cookie("token", tok, { maxAge: 300 * 1000 })
                                                 return res.json({token: tok});

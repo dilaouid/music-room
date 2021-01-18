@@ -1,8 +1,7 @@
 const express       = require('express');
 const router        = express.Router();
 const jwt           = require('jsonwebtoken');
-const cookieParser  = require('cookie-parser');
-const Validator     = require("validator");
+const crypto        = require('crypto');
 const bcrypt        = require("bcryptjs");
 const sanitize      = require('mongo-sanitize');
 const User          = require("../models/Users");
@@ -29,7 +28,6 @@ const authentified = (req, res, next) => {
         });
     }
 };
-
 /* ############# ######### ############# */
 
 router.post('/login', (req, res) => {
@@ -69,19 +67,22 @@ router.post('/register', (req, res) => {
             if (err) {
                 if (err.username && err.username === req.body.username) {
                     if (err.email && err.email === req.body.email)
-                        return res.json({same_username: true, same_email: true});
-                    return res.json({same_username: true, same_email: false});
+                        return res.json({statut: 204, msg: 'An account alreay exists with this mail and username'});
+                    return res.json({statut: 204, msg: 'An account alreay exists with this username'});
                 }
                 return res.json({same_username: false, same_email: true});
             } else {
                 
                 let token = ( (+new Date) + Math.random() * 142).toString(32);
                 let hashtoken = crypto.createHash('sha384').update(token).digest('hex');
+                const parts = req.body.birthday.split('/').map((p) => parseInt(p, 10));
+                parts[0] -= 1;
+                const formatBirthday = new Date(parts[2], parts[0], parts[1]);
                 const registeredUser = new User({
                     username: sanitize(req.body.username),
                     email: sanitize(req.body.email),
                     password: sanitize(req.body.password),
-                    birthday: sanitize(req.body.birthday),
+                    birthday: formatBirthday,
                     hashtoken: hashtoken
                 });
                 bcrypt.genSalt(10, (err, salt) => {
@@ -93,7 +94,7 @@ router.post('/register', (req, res) => {
                             .then(async(user) => {
                                 try {
                                     const userFind = await User.findOne({_id: user.id});
-                                    if (userFind) {
+                                    /* if (userFind) {
                                         // Immediately logs after registration, to delete after test
                                         jwt.sign( { id: userFind._id } , keys.SECRET, { expiresIn: 31556926, algorithm: 'HS256' }, (err, tok) => {
                                             if (!err) {
@@ -104,7 +105,7 @@ router.post('/register', (req, res) => {
                                                 throw new Error(err);
                                             }
                                         })
-                                    }
+                                    } */
                                 } catch (err) {
                                     console.log(err);
                                     return res.json({err});
@@ -113,7 +114,7 @@ router.post('/register', (req, res) => {
                             .catch(err => {console.log(err); return res.json({}) });
                     });
                 });
-
+                return res.json({statut: 200, msg: 'Your account has been created!'});
             }
         });
 });

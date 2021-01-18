@@ -51,7 +51,8 @@ export class LoginPage implements OnInit {
                   }
                   if (ret != 200) {
                     $('#alert').removeClass('d-none');
-                    $('#alertmsg').html("The password or the username is incorrect!");
+                    $('#alertmsg').html(msg);
+                    console.log(res.data);
                     $('#loginbtn').html('Log In');
                   } else {
                     console.log('success login');

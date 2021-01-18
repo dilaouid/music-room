@@ -37,21 +37,23 @@ router.post('/login', (req, res) => {
     var password = req.body.password;
 
     User.findOne( {username} ).then(async(user) => {
-        if (!user || user && !user.password)
-            return res.status(400).json({});
+        if (!user || (user && !user.password))
+            return res.status(400).json({statut: 400, msg: 'Invalid login or password'});
         bcrypt.compare(password, user.password).then(match => {
             if (match) {
                 const payload = {id: user.id};
                 jwt.sign(payload, keys.secretKey, {expiresIn: 31556926}, (err, token) => {
                     if (!err) {
                         res.cookie('token', token, { maxAge: 2 * 60 * 60 * 1000, domain: 'localhost', secure: false, sameSite: true, httpOnly: false });
-                        return resizeTo.status(200).json({});
+                        return resizeTo.status(200).json({statut: 200, msg: null});
                     }
                     console.log(err);
-                    return res.status(400).json({});
+                    return res.status(400).json({statut: 400, msg: 'An error occured'});
                 })
-            } else
-                return res.status(400).json({});
+            } else {
+                console.log(`No match for ${username} - ${password}`);
+                return res.status(400).json({statut: 400, msg:'Invalid login or password'});
+            }
         });
     });
 });

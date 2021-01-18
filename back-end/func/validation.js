@@ -21,7 +21,7 @@ const isValidDate = (s) => {
     parts[0] -= 1;
     const d = new Date(parts[2], parts[0], parts[1]);
     const today = new Date();
-    return (d.getMonth() === parts[0] && d.getDate() === parts[1] && d.getFullYear() === parts[2] && (today.getFullYear() - d.getFullYear() > 15);
+    return (d.getMonth() === parts[0] && d.getDate() === parts[1] && d.getFullYear() === parts[2]) && (today.getFullYear() - d.getFullYear() > 15);
 }
 
 const register = (data) => {

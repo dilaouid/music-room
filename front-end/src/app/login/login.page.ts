@@ -42,32 +42,26 @@ export class LoginPage implements OnInit {
       $('#loginbtn').html('Log In');
     } else {
       try {
-        await axios.post(`${environment.backEndUrl}/login`, {withCredentials: true})
+        await axios({url: `${environment.backEndUrl}/login`, method: 'post', data: {username: login, password: password}, withCredentials: true})
               .then(res => {
                   ret = res.data.statut;
                   msg = res.data.msg;
-                  if (this.cookieService.get('10HUser')) {
-                    this.cookie = this.cookieService.get('EnigmaPlayer');
+                  if (this.cookieService.get('token')) {
+                    this.cookie = this.cookieService.get('token');
+                  }
+                  if (ret != 200) {
+                    $('#alert').removeClass('d-none');
+                    $('#alertmsg').html("The password or the username is incorrect!");
+                    $('#loginbtn').html('Log In');
+                  } else {
+                    console.log('success login');
                   }
               });
       }
       catch (err) {
         console.error(err);
       }
-      if (ret != 200) {
-        $('#alert').removeClass('d-none');
-        $('#alertmsg').html("The password or the username is incorrect!");
-        $('#loginbtn').html('Log In');
-      } else {
-        console.log('success login');
-      }
     }
-
-
-  }
-
-  goToRegister() {
-    this.router.navigateByUrl('/register');
   }
 
 }

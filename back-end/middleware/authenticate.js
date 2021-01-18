@@ -72,7 +72,7 @@ router.post('/register', (req, res) => {
                         return res.json({statut: 204, msg: 'An account alreay exists with this mail and username'});
                     return res.json({statut: 204, msg: 'An account alreay exists with this username'});
                 }
-                return res.json({same_username: false, same_email: true});
+                return res.json({statut: 204, msg: 'An account alreay exists with this mail'});
             } else {
                 
                 let token = ( (+new Date) + Math.random() * 142).toString(32);

@@ -30,11 +30,9 @@ const authentified = (req, res, next) => {
     }
 };
 
-/* ############# FUNCTIONS ############# */
+/* ############# ######### ############# */
 
 router.post('/login', (req, res) => {
-
-    console.log(req.body);
 
     const username = req.body.username;
     var password = req.body.password;

@@ -27,11 +27,6 @@ export class LoginPage implements OnInit {
     }
   }
 
-  validEmail(email:string):Boolean {
-    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-  }
-
   private async login(login:string, password:string):Promise<void> {
     $('#loginbtn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
     var ret;
@@ -52,10 +47,10 @@ export class LoginPage implements OnInit {
                   if (ret != 200) {
                     $('#alert').removeClass('d-none');
                     $('#alertmsg').html(msg);
-                    console.log(res.data);
                     $('#loginbtn').html('Log In');
                   } else {
                     console.log('success login');
+                    // MAKE IT REDIRECT
                   }
               });
       }

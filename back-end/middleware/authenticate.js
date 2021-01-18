@@ -38,6 +38,8 @@ router.post('/login', (req, res) => {
     User.findOne( {username} ).then(async(user) => {
         if (!user || (user && !user.password))
             return res.json({statut: 204, msg: 'Invalid login or password'});
+        else if (user.hashtoken.length != null)
+            return res.json({statut: 204, msg: 'Please check your mail in order to complete your registration to 10H.'});
         bcrypt.compare(password, user.password).then(match => {
             if (match) {
                 const payload = {id: user.id};

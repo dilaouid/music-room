@@ -41,7 +41,7 @@ router.post('/login', (req, res) => {
 
     User.findOne( {username} ).then(async(user) => {
         if (!user || (user && !user.password))
-            return res.status(400).json({statut: 400, msg: 'Invalid login or password'});
+            return res.status(204).json({statut: 204, msg: 'Invalid login or password'});
         bcrypt.compare(password, user.password).then(match => {
             if (match) {
                 const payload = {id: user.id};
@@ -51,11 +51,11 @@ router.post('/login', (req, res) => {
                         return resizeTo.status(200).json({statut: 200, msg: null});
                     }
                     console.log(err);
-                    return res.status(400).json({statut: 400, msg: 'An error occured'});
+                    return res.status(204).json({statut: 204, msg: 'An error occured'});
                 })
             } else {
                 console.log(`No match for ${username} - ${password}`);
-                return res.status(400).json({statut: 400, msg:'Invalid login or password'});
+                return res.status(204).json({statut: 204, msg:'Invalid login or password'});
             }
         });
     });
@@ -64,17 +64,17 @@ router.post('/login', (req, res) => {
 router.post('/register', (req, res) => {
     let {error, valid} = validation.register(req.body);
     if (!{valid}) {
-        return res.status(400).json(error);
+        return res.status(204).json(error);
     }
     User.findOne({$or: [{email: sanitize(req.body.email) }, {username: sanitize(req.body.username)} ] })
         .then( (err, user) => {
             if (err) {
                 if (err.username && err.username === req.body.username) {
                     if (err.email && err.email === req.body.email)
-                        return res.status(400).json({same_username: true, same_email: true});
-                    return res.status(400).json({same_username: true, same_email: false});
+                        return res.status(204).json({same_username: true, same_email: true});
+                    return res.status(204).json({same_username: true, same_email: false});
                 }
-                return res.status(400).json({same_username: false, same_email: true});
+                return res.status(204).json({same_username: false, same_email: true});
             } else {
                 
                 let token = ( (+new Date) + Math.random() * 142).toString(32);
@@ -109,10 +109,10 @@ router.post('/register', (req, res) => {
                                     }
                                 } catch (err) {
                                     console.log(err);
-                                    return res.status(400).json({});
+                                    return res.status(204).json({});
                                 }
                             })
-                            .catch(err => {console.log(err); return res.status(400).json({}) });
+                            .catch(err => {console.log(err); return res.status(204).json({}) });
                     });
                 });
 

@@ -6,6 +6,8 @@ const authenticate  = require('./middleware/authenticate');
 const cookieParser  = require('cookie-parser');
 const express       = require('express');
 const app           = express();
+const bodyParser    = require('body-parser').json();
+const cors          = require('cors');
 
 // Connect to mongoDB
 mongoose.Promise = global.Promise;
@@ -15,6 +17,9 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 
 // Write headers
 app.use(helmet());
+app.use(bodyParser);
+app.use(cors());
+app.use(cookieParser());
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', '*');
@@ -23,8 +28,8 @@ app.use(function(req, res, next) {
     next();
 });
 
+
 // may be useful later
-app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use('/authenticate', authenticate)

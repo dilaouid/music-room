@@ -42,7 +42,7 @@ export class LoginPage implements OnInit {
       $('#loginbtn').html('Log In');
     } else {
       try {
-        await axios({url: `${environment.backEndUrl}/login`, method: 'post', data: {username: login, password: password}, withCredentials: true})
+        await axios({url: `${environment.backEndUrl}/authenticate/login`, method: 'post', data: {username: login, password: password}, withCredentials: true})
               .then(res => {
                   ret = res.data.statut;
                   msg = res.data.msg;

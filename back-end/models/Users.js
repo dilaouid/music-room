@@ -68,6 +68,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    hashtoken: {
+        type: String,
+        required: true
+    }, // to validate the account through email
     facebook: JSON,
     google: JSON
 });

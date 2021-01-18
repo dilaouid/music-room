@@ -6,6 +6,7 @@ const Validator     = require("validator");
 const bcrypt        = require("bcryptjs");
 const sanitize      = require('mongo-sanitize');
 const User          = require("../models/Users");
+const validation    = require("../func/validation");
 
 /* ############# FUNCTIONS ############# */
 const authentified = (req, res, next) => {
@@ -56,7 +57,62 @@ router.post('/login', (req, res) => {
 });
 
 router.post('/register', (req, res) => {
-    /* ###### REGISTER ACTION HERE ###### */
+    let {error, valid} = validation.register(req.body);
+    if (!{valid}) {
+        return res.status(400).json(error);
+    }
+    User.findOne({$or: [{email: sanitize(req.body.email) }, {username: sanitize(req.body.username)} ] })
+        .then( (err, user) => {
+            if (err) {
+                if (err.username && err.username === req.body.username) {
+                    if (err.email && err.email === req.body.email)
+                        return res.status(400).json({same_username: true, same_email: true});
+                    return res.status(400).json({same_username: true, same_email: false});
+                }
+                return res.status(400).json({same_username: false, same_email: true});
+            } else {
+                
+                let token = ( (+new Date) + Math.random() * 142).toString(32);
+                let hashtoken = crypto.createHash('sha384').update(token).digest('hex');
+                const registeredUser = new User({
+                    username: sanitize(req.body.username),
+                    email: sanitize(req.body.email),
+                    password: sanitize(req.body.password),
+                    birthday: sanitize(req.body.birthday),
+                    hashtoken: hashtoken
+                });
+                bcrypt.genSalt(10, (err, salt) => {
+                    bcrypt.hash(registeredUser.password, salt, (err, hash) => {
+                        if (err) throw err;
+                        registeredUser.password = hash;
+                        registeredUser
+                            .save()
+                            .then(async(user) => {
+                                try {
+                                    const userFind = await User.findOne({_id: user.id});
+                                    if (userFind) {
+                                        // Immediately logs after registration, to delete after test
+                                        jwt.sign( { id: userFind._id } , keys.SECRET, { expiresIn: 31556926, algorithm: 'HS256' }, (err, tok) => {
+                                            if (!err) {
+                                                res.cookie("token", tok, { maxAge: 300 * 1000 })
+                                                return res.status(200).json({token: tok});
+                                            } else {
+                                                console.log(err)
+                                                throw new Error(err);
+                                            }
+                                        })
+                                    }
+                                } catch (err) {
+                                    console.log(err);
+                                    return res.status(400).json({});
+                                }
+                            })
+                            .catch(err => {console.log(err); return res.status(400).json({}) });
+                    });
+                });
+
+            }
+        });
 });
 
 router.post('/forgot-password', (req, res) => {

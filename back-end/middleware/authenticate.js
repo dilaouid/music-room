@@ -62,7 +62,7 @@ router.post('/login', (req, res) => {
 router.post('/register', (req, res) => {
     let {error, valid} = validation.register(req.body);
     if (!{valid}) {
-        return res.json(error);
+        return res.json({statut: 204, msg:error});
     }
     User.findOne({$or: [{email: sanitize(req.body.email) }, {username: sanitize(req.body.username)} ] })
         .then( (err, user) => {

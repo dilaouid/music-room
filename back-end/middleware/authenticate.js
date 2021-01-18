@@ -5,6 +5,7 @@ const cookieParser  = require('cookie-parser');
 const Validator     = require("validator");
 const bcrypt        = require("bcryptjs");
 const sanitize      = require('mongo-sanitize');
+const User          = require("../models/Users");
 
 /* ############# FUNCTIONS ############# */
 const authentified = (req, res, next) => {

@@ -19,13 +19,14 @@ const routes: Routes = [
     loadChildren: () => import('./new-password/new-password.module').then( m => m.NewPasswordPageModule)
   },
   {
-    path: 'type-code',
-    loadChildren: () => import('./type-code/type-code.module').then( m => m.TypeCodePageModule)
-  },
-  {
     path: '',
     loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
   },
+  {
+    path: 'validate-account',
+    loadChildren: () => import('./validate-account/validate-account.module').then( m => m.ValidateAccountPageModule)
+  },
+
 ];
 @NgModule({
   imports: [

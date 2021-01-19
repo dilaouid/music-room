@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { TypeCodePageRoutingModule } from './type-code-routing.module';
+import { ValidateAccountPageRoutingModule } from './validate-account-routing.module';
 
-import { TypeCodePage } from './type-code.page';
+import { ValidateAccountPage } from './validate-account.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    TypeCodePageRoutingModule
+    ValidateAccountPageRoutingModule
   ],
-  declarations: [TypeCodePage]
+  declarations: [ValidateAccountPage]
 })
-export class TypeCodePageModule {}
+export class ValidateAccountPageModule {}

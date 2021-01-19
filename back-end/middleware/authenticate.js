@@ -116,7 +116,7 @@ router.post('/register', (req, res) => {
                             .catch(err => {console.log(err); return res.json({}) });
                     });
                 });
-                const link          = `${process.env.FRONT}/validate/${hashtoken}`;
+                const link          = `${process.env.FRONT}/validate?token=${hashtoken}`;
                 const mailOptions   = {
                     from:       process.env.EMAIL,
                     to:         req.body.email,

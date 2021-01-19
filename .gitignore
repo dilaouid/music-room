@@ -1,4 +1,4 @@
 node_modules
 front-end/build
 .env
-back-end/misc/nodemailer.js
+back-end\misc\nodemailer.js

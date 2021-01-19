@@ -6,7 +6,8 @@ const bcrypt        = require("bcryptjs");
 const sanitize      = require('mongo-sanitize');
 const User          = require("../models/Users");
 const validation    = require("../func/validation");
-const oauth         = require('./oauth');
+const oauthfacebook         = require('./oauth-facebook');
+const oauthgoogle         = require('./oauth-google');
 const cookieParser  = require('cookie-parser');
 
 /* ############# FUNCTIONS ############# */
@@ -153,6 +154,6 @@ router.get('/validate/:hashtoken', async (req, res) => {
         console.log(err)
     }
 });
-router.use('/oauth', oauth);
+router.use('/oauth/facebook', oauthfacebook);
 
 module.exports = router;

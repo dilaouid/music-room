@@ -41,20 +41,22 @@ export class RegisterPage implements OnInit {
     $('#registerBtn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
     var ret;
     var msg;
+    var alert;
     try {
       await axios({url: `${environment.backEndUrl}/authenticate/register`, method: 'post', data: {username: login, password: password, email: email, birthday:formatDate, confirm_password: confirm_password}})
             .then(res => {
                 ret = res.data.statut;
                 msg = res.data.msg;
+                alert = res.data.alert;
                 if (ret != 200) {
                   $('#alert').removeClass('d-none');
-                  $('#alert').addClass('alert-danger');
+                  $('#alert').addClass(`alert-${alert}`);
                   $('#alertmsg').html(msg);
                   $('#registerBtn').html('Join 10H !');
                 } else {
                   $('#registerBtn').html('Join 10H !');
-                  $('#alert').removeClass('d-none', 'alert-danger');
-                  $('#alert').addClass('alert-success');
+                  $('#alert').removeClass('d-none', 'alert-danger', 'alert-info');
+                  $('#alert').addClass(`alert-${alert}`);
                   $('#alertmsg').html(msg);
                 }
             });

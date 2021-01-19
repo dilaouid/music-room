@@ -31,6 +31,7 @@ export class LoginPage implements OnInit {
     $('#loginbtn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
     var ret;
     var msg;
+    var alert;
     if (login.trim().length < 3 || password.trim().length < 3) {
       $('#alert').removeClass('d-none');
       $('#alertmsg').html('Invalid fields!');
@@ -41,11 +42,13 @@ export class LoginPage implements OnInit {
               .then(res => {
                   ret = res.data.statut;
                   msg = res.data.msg;
+                  alert = res.data.alert;
                   if (this.cookieService.get('token')) {
                     this.cookie = this.cookieService.get('token');
                   }
                   if (ret != 200) {
-                    $('#alert').removeClass('d-none');
+                    $('#alert').removeClass('d-none', 'alert-danger', 'alert-info');
+                    $('#alert').addClass(`alert-${alert}`);
                     $('#alertmsg').html(msg);
                     $('#loginbtn').html('Log In');
                   } else {

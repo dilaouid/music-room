@@ -7,6 +7,7 @@ const sanitize      = require('mongo-sanitize');
 const User          = require("../models/Users");
 const validation    = require("../func/validation");
 const ts            = require('../misc/nodemailer');
+const cookieParser  = require('cookie-parser');
 
 /* ############# FUNCTIONS ############# */
 const authentified = (req, res, next) => {
@@ -39,7 +40,7 @@ router.post('/login', (req, res) => {
     User.findOne( {username} ).then(async(user) => {
         if (!user || (user && !user.password))
             return res.json({statut: 204, msg: 'Invalid login or password', alert:'danger'});
-        else if (user.hashtoken.length != null)
+        else if (user.hashtoken != null)
             return res.json({statut: 204, msg: 'Please check your mail in order to complete your registration to 10H.', alert:'info'});
         bcrypt.compare(password, user.password).then(match => {
             if (match) {
@@ -91,29 +92,7 @@ router.post('/register', (req, res) => {
                     bcrypt.hash(registeredUser.password, salt, (err, hash) => {
                         if (err) throw err;
                         registeredUser.password = hash;
-                        registeredUser
-                            .save()
-                            .then(async(user) => {
-                                try {
-                                    const userFind = await User.findOne({_id: user.id});
-                                    /* if (userFind) {
-                                        // Immediately logs after registration, to delete after test
-                                        jwt.sign( { id: userFind._id } , process.env.SECRET, { expiresIn: 31556926, algorithm: 'HS256' }, (err, tok) => {
-                                            if (!err) {
-                                                res.cookie("token", tok, { maxAge: 300 * 1000 })
-                                                return res.json({token: tok});
-                                            } else {
-                                                console.log(err)
-                                                throw new Error(err);
-                                            }
-                                        })
-                                    } */
-                                } catch (err) {
-                                    console.log(err);
-                                    return res.json({err});
-                                }
-                            })
-                            .catch(err => {console.log(err); return res.json({}) });
+                        registeredUser.save();
                     });
                 });
                 const link          = `${process.env.FRONT}/validate?token=${hashtoken}`;
@@ -158,8 +137,21 @@ router.get('/logout', authentified, (req, res) => {
 
 router.get('/validate/:hashtoken', async (req, res) => {
     const hash = req.params.hashtoken;
-    await User.updateOne({hashtoken: hash}, {hashtoken: null});
-    res.sendStatus(200);
+    try {
+        var msg;
+        await User.findOneAndUpdate({hashtoken: hash}, {hashtoken: null}).then(res => {
+            if (!res) {
+                msg = 'The token is invalid';
+            } else {
+                msg = 'Your account has been verified.<br>You will be redirected';
+            }
+        }).catch(err => {
+            console.log(err);
+        });
+        return res.json({msg: msg});
+    } catch(err) {
+        console.log(err)
+    }
 });
 
 module.exports = router;

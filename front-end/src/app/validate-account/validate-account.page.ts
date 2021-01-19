@@ -13,9 +13,27 @@ declare var $: any;
 })
 export class ValidateAccountPage implements OnInit {
 
-  constructor() { }
+  hashtoken: string;
 
-  ngOnInit() {
+  constructor(private route: ActivatedRoute, private router: Router) { 
+      this.route.queryParams.subscribe(params => {
+          this.hashtoken = params['token'];
+      });
+  }
+
+  async ngOnInit() {
+    if (this.hashtoken.length > 10) {
+      try {
+        await axios({url: `${environment.backEndUrl}/authenticate/validate/${this.hashtoken}`, method: 'get', withCredentials: true})
+              .then(res => {
+                  $('#result').html(res.data.msg);
+                  this.router.navigate(['login']);
+              });
+      }
+      catch (err) {
+        console.error(err);
+      }
+    }
   }
 
 }

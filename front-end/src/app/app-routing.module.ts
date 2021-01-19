@@ -23,7 +23,7 @@ const routes: Routes = [
     loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
   },
   {
-    path: 'validate-account',
+    path: 'validate',
     loadChildren: () => import('./validate-account/validate-account.module').then( m => m.ValidateAccountPageModule)
   },
 

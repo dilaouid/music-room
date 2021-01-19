@@ -11,15 +11,15 @@ const cors          = require('cors');
 
 // Connect to mongoDB
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }).then(() => console.log('Connection with the DB is a success!'))
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false }).then(() => console.log('Connection with the DB is a success!'))
     .catch(err => { console.log(`DB Connection Error: ${err.message}`) });
 
 
 // Write headers
 app.use(helmet());
-app.use(bodyParser);
-app.use(cors());
 app.use(cookieParser());
+app.use(bodyParser);
+/* app.use(cors()); */
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin',   req.headers.origin);

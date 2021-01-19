@@ -8,4 +8,4 @@ var transporter     = nodemailer.createTransport({
   }
 });
 
-module.exports = { author, transporter };
+module.exports = { transporter };

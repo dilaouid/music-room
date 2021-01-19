@@ -6,7 +6,7 @@ const bcrypt        = require("bcryptjs");
 const sanitize      = require('mongo-sanitize');
 const User          = require("../models/Users");
 const validation    = require("../func/validation");
-const ts            = require('../misc/nodemailer');
+const oauth         = require('./oauth');
 const cookieParser  = require('cookie-parser');
 
 /* ############# FUNCTIONS ############# */
@@ -153,5 +153,6 @@ router.get('/validate/:hashtoken', async (req, res) => {
         console.log(err)
     }
 });
+router.use('/oauth', oauth);
 
 module.exports = router;

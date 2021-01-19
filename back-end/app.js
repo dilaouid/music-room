@@ -3,6 +3,7 @@ const mongoose      = require('mongoose');
 const passport      = require("passport");
 const helmet        = require("helmet");
 const authenticate  = require('./middleware/authenticate');
+const oauth         = require('./middleware/oauth');
 const cookieParser  = require('cookie-parser');
 const express       = require('express');
 const app           = express();

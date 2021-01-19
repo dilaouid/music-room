@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
     },
     password:{
         type: String,
-        required: true
+        required: false
     },
     date:{
         type: Date,
@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     },
     birthday:{
         type: Date,
-        required: true
+        required: false
     },
     username: {
         type: String,
@@ -65,7 +65,7 @@ const userSchema = new mongoose.Schema({
     },
     hashtoken: {
         type: String,
-        required: true
+        required: false
     }, // to validate the account through email
     facebook: JSON,
     google: JSON

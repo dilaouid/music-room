@@ -156,16 +156,9 @@ router.get('/logout', authentified, (req, res) => {
     .sendStatus(200);
 });
 
-router.get('/validate/:hashtoken', (req, res) => {
+router.get('/validate/:hashtoken', async (req, res) => {
     const hash = req.params.hashtoken;
-    User.findOne({hashtoken: hash})
-        .then( (err, user) => {
-            if (err) { console.log(err); }
-            else {
-                user.hashtoken = null;
-                user.save();
-            }
-        });
+    await User.updateOne({hashtoken: hash}, {hashtoken: null});
     res.sendStatus(200);
 });
 

@@ -6,6 +6,7 @@ const bcrypt        = require("bcryptjs");
 const sanitize      = require('mongo-sanitize');
 const User          = require("../models/Users");
 const validation    = require("../func/validation");
+const ts            = require('../misc/nodemailer');
 
 /* ############# FUNCTIONS ############# */
 const authentified = (req, res, next) => {
@@ -115,7 +116,25 @@ router.post('/register', (req, res) => {
                             .catch(err => {console.log(err); return res.json({}) });
                     });
                 });
-                return res.json({statut: 200, msg: 'Your account has been created! Please check your email in order to validate your account!', alert:'info'});
+                const link          = `${process.env.FRONT}/validate/${hashtoken}`;
+                const mailOptions   = {
+                    from:       process.env.EMAIL,
+                    to:         req.body.email,
+                    subject:    'Validate your 10H account right now!',
+                    text:       `Hello ${req.body.username}! In order to validate your 10H account, you need to click in the following link: ${link} Enjoy the music!`,
+                    html:       `<p>Hello ${req.body.username}!<br>In order to validate your 10H account, <strong>you need to click in the following link:</strong><br><a href="${link}">I want to join 10H right now!</a><br>Enjoy the music!</p>`,
+                }
+                ts.transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.log('MAIL ERROR: ' + error);
+                        console.log(`username: ${process.env.EMAIL}\npassword: ${process.env.EMAILPASS}`);
+                        return res.json({statut: 204, msg: 'An error occured, please try again', alert:'danger'});
+                    }
+                    else {
+                        console.log('Email sent: ' + info.response);
+                        return res.json({statut: 200, msg: 'Your account has been created! Please check your email in order to validate your account!', alert:'info'});
+                    }
+                });
             }
         });
 });

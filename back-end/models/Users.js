@@ -59,10 +59,6 @@ const userSchema = new mongoose.Schema({
         type: Array,
         default: []
     }, // [eventID, eventID, eventID]
-    admin: {
-        type: Boolean,
-        default: false,
-    }, // true = admin permissions
     oauthID: {
         type: String,
         default: ''

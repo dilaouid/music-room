@@ -37,23 +37,23 @@ router.post('/login', (req, res) => {
 
     User.findOne( {username} ).then(async(user) => {
         if (!user || (user && !user.password))
-            return res.json({statut: 204, msg: 'Invalid login or password'});
+            return res.json({statut: 204, msg: 'Invalid login or password', alert:'danger'});
         else if (user.hashtoken.length != null)
-            return res.json({statut: 204, msg: 'Please check your mail in order to complete your registration to 10H.'});
+            return res.json({statut: 204, msg: 'Please check your mail in order to complete your registration to 10H.', alert:'info'});
         bcrypt.compare(password, user.password).then(match => {
             if (match) {
                 const payload = {id: user.id};
                 jwt.sign(payload, process.env.SECRET, {expiresIn: 31556926}, (err, token) => {
                     if (!err) {
                         res.cookie('token', token, { maxAge: 2 * 60 * 60 * 1000, domain: 'localhost', secure: false, sameSite: true, httpOnly: false });
-                        return res.json({statut: 200, msg: null});
+                        return res.json({statut: 200, msg: null, alert:'success'});
                     }
                     console.log(err);
-                    return res.json({statut: 204, msg: 'An error occured'});
+                    return res.json({statut: 204, msg: 'An error occured', alert:'danger'});
                 })
             } else {
                 console.log(`No match for ${username} - ${password}`);
-                return res.json({statut: 204, msg:'Invalid login or password'});
+                return res.json({statut: 204, msg:'Invalid login or password', alert:'danger'});
             }
         });
     });
@@ -69,23 +69,22 @@ router.post('/register', (req, res) => {
             if (err) {
                 if (err.username && err.username === req.body.username) {
                     if (err.email && err.email === req.body.email)
-                        return res.json({statut: 204, msg: 'An account alreay exists with this mail and username'});
-                    return res.json({statut: 204, msg: 'An account alreay exists with this username'});
+                        return res.json({statut: 204, msg: 'An account alreay exists with this email address and username', alert:'warning'});
+                    return res.json({statut: 204, msg: 'An account alreay exists with this username', alert:'warning'});
                 }
-                return res.json({statut: 204, msg: 'An account alreay exists with this mail'});
+                return res.json({statut: 204, msg: 'An account alreay exists with this email address', alert:'warning'});
             } else {
-                
                 let token = ( (+new Date) + Math.random() * 142).toString(32);
                 let hashtoken = crypto.createHash('sha384').update(token).digest('hex');
                 const parts = req.body.birthday.split('/').map((p) => parseInt(p, 10));
                 parts[1] -= 1;
                 const formatBirthday = new Date(parts[2], parts[1], parts[0]);
                 const registeredUser = new User({
-                    username: sanitize(req.body.username),
-                    email: sanitize(req.body.email),
-                    password: sanitize(req.body.password),
-                    birthday: formatBirthday,
-                    hashtoken: hashtoken
+                    username:   sanitize(req.body.username),
+                    email:      sanitize(req.body.email),
+                    password:   sanitize(req.body.password),
+                    birthday:   formatBirthday,
+                    hashtoken:  hashtoken
                 });
                 bcrypt.genSalt(10, (err, salt) => {
                     bcrypt.hash(registeredUser.password, salt, (err, hash) => {
@@ -116,7 +115,7 @@ router.post('/register', (req, res) => {
                             .catch(err => {console.log(err); return res.json({}) });
                     });
                 });
-                return res.json({statut: 200, msg: 'Your account has been created!'});
+                return res.json({statut: 200, msg: 'Your account has been created! Please check your email in order to validate your account!', alert:'info'});
             }
         });
 });
@@ -133,9 +132,22 @@ router.post('/new-password', (req, res) => {
     /* ###### NEW PASSWORD ACTION HERE ###### */
 });
 
-router.get ('/logout', authentified, (req, res) => {
+router.get('/logout', authentified, (req, res) => {
     res.clearCookie('token')
     .sendStatus(200);
+});
+
+router.get('/validate/:hashtoken', (req, res) => {
+    const hash = req.params.hashtoken;
+    User.findOne({hashtoken: hash})
+        .then( (err, user) => {
+            if (err) { console.log(err); }
+            else {
+                user.hashtoken = null;
+                user.save();
+            }
+        });
+    res.sendStatus(200);
 });
 
 module.exports = router;

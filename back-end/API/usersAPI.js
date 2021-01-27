@@ -2,7 +2,6 @@ const express       = require('express');
 const router        = express.Router();
 const User          = require("../models/Users");
 const authentified  = require("../middleware/auth");
-const haveAccess    = require("../func/access");
 
 router.get('/users', authentified, (req, res) => {
     User.find( {}, {givenLikes: 0, givenDislikes: 0, admin: 0, oauthID: 0, password: 0, birthday: 0, hashtoken: 0, date: 0} ).then(async(user) => {

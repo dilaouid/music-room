@@ -101,12 +101,9 @@ router.post('/forgot-password', (req, res) => {
     /* ###### SEND CODE TO EMAIL ACTION HERE ###### */
 });
 
-router.post('/check-code', (req, res) => {
-    /* ###### CHECK CODE ACTION HERE ###### */
-});
-
-router.post('/new-password', (req, res) => {
+router.post('/new-password/:token', (req, res) => {
     /* ###### NEW PASSWORD ACTION HERE ###### */
+    const token = req.params.token;
 });
 
 router.get('/logout', authentified, (req, res) => {

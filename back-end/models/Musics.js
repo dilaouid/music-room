@@ -1,8 +1,16 @@
 const mongoose = require('mongoose');
 
 const musicSchema = new mongoose.Schema({
-    group: {
+    deezer: {
+        type: Number,
+        required: true
+    },
+    title: {
         type: String,
+        required: true
+    },
+    group: {
+        type: Array,
         required: true
     },
     date:{
@@ -14,13 +22,9 @@ const musicSchema = new mongoose.Schema({
         required: true
     },
     duration:{
-        type: String,
+        type: Number,
         required: true
     },
-    genre:{
-        type: Array,
-        default: []
-    }, // [genreA, genreB, genreC]
     likes:{
         type: Array,
         default: []

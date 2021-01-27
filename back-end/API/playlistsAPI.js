@@ -33,7 +33,7 @@ router.get('/playlists/:id', authentified, (req, res) => {
     const id = req.params.id;
     const token = req.cookies.token;
     Playlist.findById( id ).then(async(playlist) => {
-        if (playlist && ( (el.private == true && el.user == token) || el.private == false) ) {
+        if (playlist && ( (playlist.private == true && playlist.user == token) || playlist.private == false) ) {
             res.json({statut: 200, data:{
                 uuid: playlist._id,
                 creator: playlist.user,
@@ -42,10 +42,10 @@ router.get('/playlists/:id', authentified, (req, res) => {
                 dislikes: playlist.dislikes.length,
                 events: playlist.inEvents
             }});
-        } else if(!accessPlaylist) {
+        } else if(playlist.private == true && playlist.user == token) {
             res.json({statut: 403, res:'Access denied'})
         } else {
-            res.json({statut: 400, res:'User not found'})
+            res.json({statut: 400, res:'Plalist not found'})
         }
     }).catch(err => {
         return res.json({statut: 400, res:'Invalid id'});

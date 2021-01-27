@@ -3,7 +3,7 @@ const router        = express.Router();
 const User          = require("../models/Users");
 const authentified  = require("../middleware/auth");
 
-router.get('/users', authentified, (req, res) => {
+router.get('/', authentified, (req, res) => {
     User.find( {}, {givenLikes: 0, givenDislikes: 0, admin: 0, oauthID: 0, password: 0, birthday: 0, hashtoken: 0, date: 0} ).then(async(user) => {
         var usersList = [];
         if (user) {
@@ -26,7 +26,7 @@ router.get('/users', authentified, (req, res) => {
     });
 });
 
-router.get('/users/:id', authentified, (req, res) => {
+router.get('/:id', authentified, (req, res) => {
     const id = req.params.id;
     User.findById( id ).then(async(user) => {
         if (user) {

@@ -33,10 +33,10 @@ const addMusicToDB = async (id) => {
                     group:      music.group,
                     cover:      music.image,
                     date:       music.date,
-                    likes:      music.likes.length,
-                    dislikes:   music.dislikes.length,
-                    playlists:  music.inPlaylists,
-                    looped:     music.listened
+                    likes:      0,
+                    dislikes:   0,
+                    playlists:  [],
+                    looped:     0
                 }
             }
         });
@@ -77,8 +77,8 @@ const addNewTrackByName = async (name) => {
                         group:      addMusic.data.group,
                         cover:      addMusic.data.image,
                         date:       addMusic.data.date,
-                        likes:      addMusic.data.likes      == undefined ? 0 : addMusic.data.length,
-                        dislikes:   addMusic.data.dislikes   == undefined ? 0 : addMusic.data.length,
+                        likes:      0,
+                        dislikes:   0,
                         playlists:  addMusic.data.playlists,
                         looped:     addMusic.data.looped
                     });

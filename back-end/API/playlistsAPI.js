@@ -7,7 +7,6 @@ router.get('/playlists', authentified, (req, res) => {
     const token = req.cookies.token;
     Playlist.find( {}, {date: 0} ).then(async(playlist) => {
         var playlistAll = [];
-        var accessPlaylist;
         if (playlist) {
             playlist.forEach(el => {
                 if ((el.private == true && el.user == token) || (el.private == false) ){
@@ -32,6 +31,7 @@ router.get('/playlists', authentified, (req, res) => {
 
 router.get('/playlists/:id', authentified, (req, res) => {
     const id = req.params.id;
+    const token = req.cookies.token;
     Playlist.findById( id ).then(async(playlist) => {
         if (playlist && ( (el.private == true && el.user == token) || el.private == false) ) {
             res.json({statut: 200, data:{

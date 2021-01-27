@@ -4,6 +4,7 @@ const passport      = require("passport");
 const helmet        = require("helmet");
 const authenticate  = require('./middleware/authenticate');
 const oauth         = require('./middleware/oauth-facebook');
+const api           = require('./API/api');
 const cookieParser  = require('cookie-parser');
 const express       = require('express');
 const app           = express();
@@ -34,6 +35,7 @@ app.use(function(req, res, next) {
 app.use(passport.initialize());
 
 app.use('/authenticate', authenticate)
+app.use('/api', api)
 
 app.listen(process.env.PORT, () => {
     console.log(`Listening on PORT ${process.env.PORT}`);

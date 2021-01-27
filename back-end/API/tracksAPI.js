@@ -27,12 +27,12 @@ const addMusicToDB = async (id) => {
                 statut: 200,
                 data: {
                     uuid:       music._id,
-                    deezer:     music.deezerid,
+                    deezer:     music.deezer,
                     duration:   music.duration,
                     title:      music.title,
                     group:      music.group,
                     cover:      music.image,
-                    release:    music.date,
+                    date:       music.date,
                     likes:      music.likes.length,
                     dislikes:   music.dislikes.length,
                     playlists:  music.inPlaylists,
@@ -43,6 +43,52 @@ const addMusicToDB = async (id) => {
         return (res);
     }
 }
+
+const addNewTrackByName = async (name) => {
+    var   data = await axios.get(`${deezerURL}/search?q=${name}`);
+    data = data.data;
+    var     musicList = [];
+    var     addMusic;
+    for (let i = 0; i < data.data.length; i++) {
+        const el = data.data[i];
+        await Music.findOne( {deezer: el.id }).then( async (music) => {
+            if (music) {
+                musicList.push({
+                    uuid:       music._id,
+                    deezer:     music.deezer,
+                    duration:   music.duration,
+                    title:      music.title,
+                    group:      music.group,
+                    cover:      music.image,
+                    date:       music.date,
+                    likes:      music.likes    == undefined ? 0 : music.likes.length,
+                    dislikes:   music.dislikes == undefined ? 0 : music.dislikes.length,
+                    playlists:  music.inPlaylists,
+                    looped:     music.listened
+                });
+            } else {
+                addMusic = await addMusicToDB(el.id);
+                if (addMusic.data)
+                    musicList.push({
+                        uuid:       addMusic.data.uuid,
+                        deezer:     addMusic.data.deezer,
+                        duration:   addMusic.data.duration,
+                        title:      addMusic.data.title,
+                        group:      addMusic.data.group,
+                        cover:      addMusic.data.image,
+                        date:       addMusic.data.date,
+                        likes:      addMusic.data.likes      == undefined ? 0 : addMusic.data.length,
+                        dislikes:   addMusic.data.dislikes   == undefined ? 0 : addMusic.data.length,
+                        playlists:  addMusic.data.playlists,
+                        looped:     addMusic.data.looped
+                    });
+            }
+            }).catch (err => {
+                console.log(err);
+            });
+    }
+    return (musicList);
+};
 
 router.get('/', authentified, (req, res) => {
     Music.find( {} ).then(async(music) => {
@@ -68,6 +114,16 @@ router.get('/', authentified, (req, res) => {
             res.json({statut: 400, res:'No musics'})
         }
     });
+});
+
+router.get('/search', async (req, res) => {
+    const name = req.query.name;
+    if (name && name.length > 3) {
+        var musicList = await addNewTrackByName(name);
+        res.json({statut: 200, res: musicList})
+    } else {
+        res.json({statut: 400, res:'Name must me contains at least 3 characters'})
+    }
 });
 
 router.get('/:id', (req, res) => {
@@ -96,5 +152,6 @@ router.get('/:id', (req, res) => {
         return res.json({statut: 400, res:'Invalid id'});
     });
 });
+
 
 module.exports = router;

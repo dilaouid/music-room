@@ -45,7 +45,7 @@ const addMusicToDB = async (id) => {
 }
 
 const addNewTrackByName = async (name) => {
-    var   data = await axios.get(`${deezerURL}/search?q=${name}`);
+    var   data = await axios.get(`${deezerURL}/search?q=${name}&strict=on`);
     data = data.data;
     var     musicList = [];
     var     addMusic;

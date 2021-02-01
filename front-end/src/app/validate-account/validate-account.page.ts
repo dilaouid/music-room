@@ -35,5 +35,4 @@ export class ValidateAccountPage implements OnInit {
       }
     }
   }
-
 }

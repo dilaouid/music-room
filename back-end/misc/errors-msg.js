@@ -11,4 +11,17 @@ const error_register_msg = {
         wrong_birthday: 'Your birthday is invalid'
 };
 
-module.exports = { error_register_msg };
+const events = {
+        name: 'The name of the event is required',
+        description: 'A description is required',
+        localistation: 'Localisation is required',
+        playlist: 'A playlist is required',
+        date: 'The date is not valid'
+};
+
+const playlists = {
+        name: 'The name of the playlist is required'
+};
+
+
+module.exports = { error_register_msg, events, playlists };

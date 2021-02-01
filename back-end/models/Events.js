@@ -41,7 +41,7 @@ const eventSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    poll:{
+    poll: {
         type: Array,
         default: []
     }, // [musicID, musicID, musicID]

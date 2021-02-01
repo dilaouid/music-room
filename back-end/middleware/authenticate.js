@@ -10,6 +10,7 @@ const validation    = require("../func/validation");
 const oauthfacebook = require('./oauth-facebook');
 const oauthgoogle   = require('./oauth-google');
 const cookieParser  = require('cookie-parser');
+const ts            = require('../misc/nodemailer')
 
 router.post('/login', (req, res) => {
 
@@ -19,7 +20,7 @@ router.post('/login', (req, res) => {
     User.findOne( {username} ).then(async(user) => {
         if (!user || (user && !user.password))
             return res.json({statut: 204, msg: 'Invalid login or password', alert:'danger'});
-        else if (user.hashtoken != null)
+        else if (user.hashtoken.length > 0)
             return res.json({statut: 204, msg: 'Please check your mail in order to complete your registration to 10H.', alert:'info'});
         bcrypt.compare(password, user.password).then(match => {
             if (match) {

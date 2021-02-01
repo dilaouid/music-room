@@ -1,7 +1,31 @@
 const express       = require('express');
 const router        = express.Router();
 const Event         = require("../models/Events");
+const User          = require("../models/Users");
+const Playlist      = require("../models/Playlists");
 const authentified  = require("../middleware/auth");
+const validation    = require("../func/validation");
+const sanitize      = require("mongo-sanitize");
+const jwt           = require('jsonwebtoken');
+const bodyParser    = require('body-parser');
+const urlencodedParser = bodyParser.urlencoded({extended: false});
+
+
+const getInfos = ( async (token) => {
+    var usernameByToken;
+    await jwt.verify(token, process.env.SECRET, async function(err, decoded) {
+        if (err) {
+            res.status(400).send('Forbidden access: Provided token is invalid');
+        } else {
+            usernameByToken = await User.findById(decoded.id).then( async (data) => {
+                if (data) {
+                    return { username: data.username, id: decoded.id } ;
+                }
+            });
+        }
+    });
+    return (usernameByToken)
+});
 
 router.get('/', authentified, (req, res) => {
     const token = req.cookies.token;
@@ -27,7 +51,7 @@ router.get('/', authentified, (req, res) => {
             });
             res.json({statut: 200, data: eventList});
         } else {
-            res.json({statut: 400, res:'No events'})
+            res.json({statut: 400, res: 'No events'})
         }
     });
 });
@@ -56,5 +80,53 @@ router.get('/:id', authentified, (req, res) => {
     });
 });
 
+router.post('/new', urlencodedParser, authentified, async (req, res) => {
+    const token         = req.cookies.token;
+    const valid         = validation.events(req.body);
+    const infos         = await getInfos(token);
+    var err = null;
+    var playlistUsed    = req.body.playlist;
+    var username        = infos.username;
+    var userid          = infos.id;
+    if (!valid.isValid) { res.json({ statut: 400, res:valid.errors }); }
+    var membersParsed = req.body.members.length > 0 ? req.body.members.replace(/ /g,'').split(',') : [];
+    var adminsParsed  = req.body.admins.length > 0 ? req.body.admins.replace(/ /g,'').split(',') : ["dfs", "grospd"];
+    await User.find({"username" : {$in : membersParsed, $exists: true, $ne: null}}, (err, data) => {
+        if (data.length == 0) { err = `User does not exists`; }
+    });
+    await User.find({"username" : {$in : adminsParsed, $exists: true, $ne: null}}, (err, data) => {
+        if (data.length == 0) { err = `User does not exists`; }
+    });
+    await Playlist.findById(playlistUsed).then(async data => {
+        if (!data || data.user != userid) { err = `This playlist cannot be used`; }
+    }).catch(err => { console.log(err) });
+    if (err) { res.json({ statut: 400, res: err }); }
+    else {
+        !adminsParsed.includes(username) ? adminsParsed.push(username) : '';
+        const parts = req.body.date.split('/').map((p) => parseInt(p, 10));
+        parts[1] -= 1;
+        const formatDate = new Date(parts[2], parts[1], parts[0]);
+        const newEvent = new Event({
+            name:               sanitize(req.body.name),
+            description:        sanitize(req.body.description),
+            date:               formatDate,
+            localisation:       sanitize(req.body.localisation),
+            playlist:           sanitize(req.body.playlist),
+            members:            membersParsed,
+            admins:             adminsParsed,
+            private:            req.body.private,
+        }).save();
+        res.json({statut: 200, data:{
+            name:               sanitize(req.body.name),
+            description:        sanitize(req.body.description),
+            date:               formatDate,
+            localisation:       sanitize(req.body.localisation),
+            playlist:           sanitize(req.body.playlist),
+            members:            membersParsed,
+            admins:             adminsParsed,
+            private:            req.body.private
+        }});
+    }
+});
 
 module.exports = router;

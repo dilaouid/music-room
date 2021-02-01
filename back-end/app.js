@@ -7,7 +7,7 @@ const api           = require('./API/api');
 const cookieParser  = require('cookie-parser');
 const express       = require('express');
 const app           = express();
-const bodyParser    = require('body-parser').json();
+const bodyParser    = require('body-parser');
 /* const cors          = require('cors'); */
 
 // Connect to mongoDB
@@ -19,7 +19,8 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 // Write headers
 app.use(helmet());
 app.use(cookieParser());
-app.use(bodyParser);
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json());
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin',   req.headers.origin);

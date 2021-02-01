@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken')
+
+
 /* ############# FUNCTIONS ############# */
 const authentified = (req, res, next) => {
     let token;

@@ -1,7 +1,29 @@
 const express       = require('express');
 const router        = express.Router();
 const Playlist      = require("../models/Playlists");
+const User          = require("../models/Users");
 const authentified  = require("../middleware/auth");
+const validation    = require("../func/validation");
+const sanitize      = require("mongo-sanitize");
+const jwt           = require('jsonwebtoken');
+const bodyParser    = require('body-parser');
+const urlencodedParser = bodyParser.urlencoded({extended: false});
+
+const getInfos = ( async (token) => {
+    var usernameByToken;
+    await jwt.verify(token, process.env.SECRET, async function(err, decoded) {
+        if (err) {
+            res.status(400).send('Forbidden access: Provided token is invalid');
+        } else {
+            usernameByToken = await User.findById(decoded.id).then( async (data) => {
+                if (data) {
+                    return { username: data.username, id: decoded.id } ;
+                }
+            });
+        }
+    });
+    return (usernameByToken)
+});
 
 router.get('/playlists', authentified, (req, res) => {
     const token = req.cookies.token;
@@ -50,6 +72,21 @@ router.get('/playlists/:id', authentified, (req, res) => {
     }).catch(err => {
         return res.json({statut: 400, res:'Invalid id'});
     });
+});
+
+router.post('/new', urlencodedParser, authentified, async (req, res) => {
+    const token         = req.cookies.token;
+    const valid         = validation.playlists(req.body);
+    var userid          = await getInfos(token);
+    if (valid.isValid == false) { res.json({ statut: 400, res:valid.errors }); }
+    const newPlaylist = new Playlist({
+        user: userid.id,
+        name: sanitize(req.body.name)
+    }).save();
+    res.json({statut: 200, data:{
+        user: userid.id,
+        name: sanitize(req.body.name)
+    }});
 });
 
 module.exports = router;

@@ -89,13 +89,16 @@ router.post('/new', urlencodedParser, authentified, async (req, res) => {
     var username        = infos.username;
     var userid          = infos.id;
     if (!valid.isValid) { res.json({ statut: 400, res:valid.errors }); }
-    var membersParsed = req.body.members.length > 0 ? req.body.members.replace(/ /g,'').split(',') : [];
-    var adminsParsed  = req.body.admins.length > 0 ? req.body.admins.replace(/ /g,'').split(',') : ["dfs", "grospd"];
+    var membersParsed = req.body.members.length > 0 ? req.body.members.replace(/ /g,'').split(',') : [username];
+    var adminsParsed  = req.body.admins.length > 0 ? req.body.admins.replace(/ /g,'').split(',') : [username];
+    adminsParsed.forEach(el => { !membersParsed.includes(el) && el ? membersParsed.push(el) : ''; });
+    var membersID   = [userid];
+    var adminsID    = [userid];
     await User.find({"username" : {$in : membersParsed, $exists: true, $ne: null}}, (err, data) => {
-        if (data.length == 0) { err = `User does not exists`; }
+        membersID.includes(data._id) ? '' : membersID.push(data._id);
     });
     await User.find({"username" : {$in : adminsParsed, $exists: true, $ne: null}}, (err, data) => {
-        if (data.length == 0) { err = `User does not exists`; }
+        adminsID.includes(data._id) ? '' : adminsID.push(data._id);
     });
     await Playlist.findById(playlistUsed).then(async data => {
         if (!data || data.user != userid) { err = `This playlist cannot be used`; }
@@ -112,8 +115,8 @@ router.post('/new', urlencodedParser, authentified, async (req, res) => {
             date:               formatDate,
             localisation:       sanitize(req.body.localisation),
             playlist:           sanitize(req.body.playlist),
-            members:            membersParsed,
-            admins:             adminsParsed,
+            members:            membersID,
+            admins:             adminsID,
             private:            req.body.private,
         }).save();
         res.json({statut: 200, data:{

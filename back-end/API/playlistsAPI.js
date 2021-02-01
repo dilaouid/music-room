@@ -67,7 +67,7 @@ router.get('/playlists/:id', authentified, (req, res) => {
         } else if(playlist.private == true && playlist.user == token) {
             res.json({statut: 403, res:'Access denied'})
         } else {
-            res.json({statut: 400, res:'Plalist not found'})
+            res.json({statut: 400, res:'Playlist not found'})
         }
     }).catch(err => {
         return res.json({statut: 400, res:'Invalid id'});
@@ -87,6 +87,36 @@ router.post('/new', urlencodedParser, authentified, async (req, res) => {
         user: userid.id,
         name: sanitize(req.body.name)
     }});
+});
+
+router.post('/update', urlencodedParser, authentified, async (req, res) => {
+    const   token         = req.cookies.token;
+    var     userid        = await getInfos(token).id;
+    const   playlistID    = req.body.playlist;
+    const   musicID       = req.body.music;
+    var playlist = await Playlist.findById(playlistID).then(err, data => {
+        if (err) { console.log(err); }
+        if (data) { return (data); }
+    });
+    if (playlist == null) {
+        res.json({statut: 400, res:'Playlist not found'})
+    } else if (playlist.user != userid) {
+        res.json({statut: 403, res:'Access denied'});
+    } else {
+        var music = await Music.findById(musicID).then(err, data => {
+            if (err) { console.log(err); }
+            if (data) { return (data); }
+        });
+        if (music == null) {
+            res.json({statut: 400, res:'Music not found'})
+        }
+        if (music.tracks.include(musicID)) {
+            Playlist.findByIdAndUpdate(playlistID, { $pull: { tracks: musicID } });
+        } else {
+            Playlist.findByIdAndUpdate(playlistID, { $push: { tracks: musicID } });
+        }
+        res.json({statut: 200, res:'OK' });
+    }
 });
 
 module.exports = router;

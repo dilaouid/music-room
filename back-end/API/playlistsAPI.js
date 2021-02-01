@@ -1,6 +1,7 @@
 const express       = require('express');
 const router        = express.Router();
 const Playlist      = require("../models/Playlists");
+const Music         = require("../models/Musics");
 const User          = require("../models/Users");
 const authentified  = require("../middleware/auth");
 const validation    = require("../func/validation");
@@ -91,11 +92,11 @@ router.post('/new', urlencodedParser, authentified, async (req, res) => {
 
 router.post('/update', urlencodedParser, authentified, async (req, res) => {
     const   token         = req.cookies.token;
-    var     userid        = await getInfos(token).id;
+    var     infos         = await getInfos(token);
+    var     userid        = infos.id;
     const   playlistID    = req.body.playlist;
     const   musicID       = req.body.music;
-    var playlist = await Playlist.findById(playlistID).then(err, data => {
-        if (err) { console.log(err); }
+    var playlist = await Playlist.findById(playlistID).then(data => {
         if (data) { return (data); }
     });
     if (playlist == null) {
@@ -103,17 +104,16 @@ router.post('/update', urlencodedParser, authentified, async (req, res) => {
     } else if (playlist.user != userid) {
         res.json({statut: 403, res:'Access denied'});
     } else {
-        var music = await Music.findById(musicID).then(err, data => {
-            if (err) { console.log(err); }
+        var music = await Music.findById(musicID).then(data => {
             if (data) { return (data); }
         });
-        if (music == null) {
-            res.json({statut: 400, res:'Music not found'})
-        }
-        if (music.tracks.include(musicID)) {
-            Playlist.findByIdAndUpdate(playlistID, { $pull: { tracks: musicID } });
+        if (music == null) { res.json({statut: 400, res:'Music not found'}); }
+        if (playlist.tracks.includes(musicID)) {
+            await Playlist.updateOne({"_id": playlistID}, { $pull: { tracks: musicID } });
+            console.log(`${musicID} removed ${playlistID}`);
         } else {
-            Playlist.findByIdAndUpdate(playlistID, { $push: { tracks: musicID } });
+            await Playlist.updateOne({"_id": playlistID}, { $push: { tracks:  musicID } });
+            console.log(`${musicID} added to ${playlistID}`);
         }
         res.json({statut: 200, res:'OK' });
     }

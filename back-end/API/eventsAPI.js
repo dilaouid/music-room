@@ -5,27 +5,11 @@ const User          = require("../models/Users");
 const Playlist      = require("../models/Playlists");
 const authentified  = require("../middleware/auth");
 const validation    = require("../func/validation");
+const getInfos      = require("../func/getInfos");
 const sanitize      = require("mongo-sanitize");
-const jwt           = require('jsonwebtoken');
 const bodyParser    = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
-
-const getInfos = ( async (token) => {
-    var usernameByToken;
-    await jwt.verify(token, process.env.SECRET, async function(err, decoded) {
-        if (err) {
-            res.status(400).send('Forbidden access: Provided token is invalid');
-        } else {
-            usernameByToken = await User.findById(decoded.id).then( async (data) => {
-                if (data) {
-                    return { username: data.username, id: decoded.id } ;
-                }
-            });
-        }
-    });
-    return (usernameByToken)
-});
 
 router.get('/', authentified, (req, res) => {
     const token = req.cookies.token;

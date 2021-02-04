@@ -1,30 +1,14 @@
 const express       = require('express');
 const router        = express.Router();
+const User          = require("../models/Users");
 const Playlist      = require("../models/Playlists");
 const Music         = require("../models/Musics");
-const User          = require("../models/Users");
 const authentified  = require("../middleware/auth");
 const validation    = require("../func/validation");
+const getInfos      = require("../func/getInfos");
 const sanitize      = require("mongo-sanitize");
-const jwt           = require('jsonwebtoken');
 const bodyParser    = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({extended: false});
-
-const getInfos = ( async (token) => {
-    var usernameByToken;
-    await jwt.verify(token, process.env.SECRET, async function(err, decoded) {
-        if (err) {
-            res.status(400).send('Forbidden access: Provided token is invalid');
-        } else {
-            usernameByToken = await User.findById(decoded.id).then( async (data) => {
-                if (data) {
-                    return { username: data.username, id: decoded.id } ;
-                }
-            });
-        }
-    });
-    return (usernameByToken)
-});
 
 router.get('/playlists', authentified, (req, res) => {
     const token = req.cookies.token;
@@ -79,11 +63,15 @@ router.post('/new', urlencodedParser, authentified, async (req, res) => {
     const token         = req.cookies.token;
     const valid         = validation.playlists(req.body);
     var userid          = await getInfos(token);
+    console.log(userid)
     if (valid.isValid == false) { res.json({ statut: 400, res:valid.errors }); }
-    const newPlaylist = new Playlist({
+    const newPlaylist = await new Playlist({
         user: userid.id,
         name: sanitize(req.body.name)
     }).save();
+    User.findByIdAndUpdate(userid.id, { $push: { playlists:  newPlaylist._id } }, (err, model) => {
+        console.log(err);
+    })
     res.json({statut: 200, data:{
         user: userid.id,
         name: sanitize(req.body.name)

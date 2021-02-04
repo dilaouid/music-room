@@ -2,6 +2,7 @@ const express       = require('express');
 const router        = express.Router();
 const User          = require("../models/Users");
 const authentified  = require("../middleware/auth");
+const getInfos      = require("../func/getInfos");
 
 router.get('/', authentified, (req, res) => {
     User.find( {}, {givenLikes: 0, givenDislikes: 0, admin: 0, oauthID: 0, password: 0, birthday: 0, hashtoken: 0, date: 0} ).then(async(user) => {
@@ -26,13 +27,62 @@ router.get('/', authentified, (req, res) => {
     });
 });
 
+router.get('/valid-token', authentified, (req, res) => {
+    res.json({statut: 200, res:'OK'})
+});
+
+router.get('/me', authentified, async (req, res) => {
+    const   token         = req.cookies.token;
+    var     infos         = await getInfos(token);
+    var     userid        = infos.id;
+    User.findById(userid).then((user) => {
+        res.json({statut: 200, data:{
+            uuid: user._id,
+            username: user.username,
+            picture: user.img,
+            description: user.description,
+            playlist: user.playlists,
+            following: user.following,
+            followers: user.followers,
+            events: user.events
+        }});
+    });
+});
+
+router.get('/follow/:id', authentified, async (req, res) => {
+    const   token         = req.cookies.token;
+    const   followID      = req.params.id;
+    var     infos         = await getInfos(token);
+    var     userid        = infos.id;
+    await User.findById(userid).then(async (user) => {
+        if (user.following.includes(followID)) {
+            User.findByIdAndUpdate(followID, { $pull: { followers: userid }}, (err, model) => {
+                if (model) {
+                    console.log(`${userid} stopped following ${followID}`);
+                    user.following.pull(followID);
+                    user.save();
+                }
+            });
+        } else {
+            User.findByIdAndUpdate(followID, { $push: { followers: userid }}, (err, model) => {
+                if (model) {
+                    console.log(`${userid} follows ${followID}`);
+                    user.following.push(followID);
+                    user.save();
+                }
+            });
+        }
+    });
+    res.json({statut: 200, res: 'OK'});
+});
+
 router.get('/:id', authentified, (req, res) => {
     const id = req.params.id;
     User.findById( id ).then(async(user) => {
         if (user) {
             res.json({statut: 200, data:{
                 uuid: user._id,
-                username: user.oauthID ? `${user.firstname} ${user.lastname}` : user.username,
+                username: user.username,
                 picture: user.img,
                 description: user.description,
                 playlist: user.playlists,

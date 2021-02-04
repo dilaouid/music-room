@@ -90,8 +90,10 @@ const addNewTrackByName = async (name) => {
     return (musicList);
 };
 
-router.get('/', authentified, (req, res) => {
-    Music.find( {} ).then(async(music) => {
+router.get('/all', authentified, async (req, res) => {
+    const limit = req.query.limit ? parseInt(req.query.limit) : 0;
+    var count   = Math.floor(Math.random() * await Music.countDocuments());
+    Music.find( {} ).limit(limit).skip(count).then(async(music) => {
         var musicList = [];
         if (music) {
             music.forEach(el => {
@@ -116,8 +118,8 @@ router.get('/', authentified, (req, res) => {
     });
 });
 
-router.get('/search', async (req, res) => {
-    const name = req.query.name;
+router.get('/search', authentified, async (req, res) => {
+    const name  = req.query.name;
     if (name && name.length > 3) {
         var musicList = await addNewTrackByName(name);
         res.json({statut: 200, res: musicList})
@@ -126,7 +128,7 @@ router.get('/search', async (req, res) => {
     }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', authentified, (req, res) => {
     const id = req.params.id;
     Music.findOne( {deezer: id} ).then(async(music) => {
         if (music) {

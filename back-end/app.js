@@ -8,13 +8,11 @@ const cookieParser  = require('cookie-parser');
 const express       = require('express');
 const app           = express();
 const bodyParser    = require('body-parser');
-/* const cors          = require('cors'); */
 
 // Connect to mongoDB
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false }).then(() => console.log('Connection with the DB is a success!'))
     .catch(err => { console.log(`DB Connection Error: ${err.message}`) });
-
 
 // Write headers
 app.use(helmet());

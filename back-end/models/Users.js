@@ -64,11 +64,15 @@ const userSchema = new mongoose.Schema({
     oauthID: {
         type: String,
         default: ''
-    },
+    }, // if the user created his account with an oauth
     hashtoken: {
         type: String,
         required: false
     }, // to validate the account through email
+    passtoken: {
+        type: String,
+        default: ''
+    }, // to recover password
     facebook: JSON,
     google: JSON
 });

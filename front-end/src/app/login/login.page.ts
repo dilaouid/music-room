@@ -52,6 +52,7 @@ export class LoginPage implements OnInit {
                     $('#alertmsg').html(msg);
                     $('#loginbtn').html('Log In');
                   } else {
+                    /* REDIRECT AFTER LOGIN */
                     console.log('success login');
                   }
               });

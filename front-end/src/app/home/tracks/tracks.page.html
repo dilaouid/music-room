@@ -1,26 +1,25 @@
 <ion-content [scrollEvents]="true">
 <div id="tracks">
   
-  <!-- Start: OmEleSearchSimple -->
-    <div class="row no-gutters padMar">
+<div class="row no-gutters padMar" style="margin-bottom: 10px;">
       <div class="col padMar">
           <div class="input-group">
-              <div class="input-group-prepend"></div><input class="form-control autocomplete" type="text" placeholder="Search for a song" style="background: rgba(17, 17, 17, 0.521);color: rgb(119,126,133);">
+              <div class="input-group-prepend"></div>
+              <input #searchTrackValue (input)='searchTrack(searchTrackValue.value)' class="form-control autocomplete" type="text" placeholder="Search for a song" style="background: rgba(17, 17, 17, 0.521);color: rgb(119,126,133);">
           </div>
       </div>
   </div>
-  <!-- End: OmEleSearchSimple -->
   
   
-  <div class="row no-gutters" style="margin-bottom: 32px;">
+<div id="searchTrackBilan" class="row no-gutters d-none" style="margin-bottom: 32px;">
   <div class="col">
-      <h5 class="text-center text-body" style="margin-top: 17px;">x results for "Your song"</h5>
+      <h5 class="text-center text-body" style="margin-top: 17px;" id="searchTrackResults"></h5>
   </div>
 </div>
 
 
 
-<div class="row no-gutters align-items-center rowMusicItem" data-bs-hover-animate="pulse" *ngFor="let p of tracksTrackTab" id="musicID">
+<div class="row no-gutters align-items-center rowMusicItem" data-bs-hover-animate="pulse" *ngFor="let p of tracksTrackTab" id="{{p.uuid}}">
   <div class="col-3">
       <img src="{{p.cover}}" style="width: 83px;">
   </div>
@@ -29,7 +28,7 @@
       <strong> {{p.group[0].name}}</strong><br> 
       <i class="fas fa-music"></i> 
       <em> {{p.title}}</em><br> 
-      <i class="far fa-clock"></i> 2:15</p>
+      <i class="far fa-clock"></i> {{p.duration}}</p>
   </div>
 
   <div class="col-2 text-right" style="margin-top: 11px;">

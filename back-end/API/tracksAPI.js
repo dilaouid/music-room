@@ -8,27 +8,28 @@ const deezerURL     = 'https://api.deezer.com';
 const addMusicToDB = async (id) => {
     var data;
     var res = { statut: 400, data: 'An error occured' };
-    await axios.get(`${deezerURL}/track/${id}`).then( async (res) => {
+    data = await axios.get(`${deezerURL}/track/${id}`).then( async (res) => {
         data = {
             deezer:     res.data.id,
             title:      res.data.title,
             group:      res.data.artist,
             date:       res.data.release_date,
             image:      res.data.album.cover,
-            duration:   res.data.duration
+            duration:   (new Date(res.data.duration * 1000).toISOString().substr(15, 4))
         };
         await new Music(data).save();
+        return data;
     }).catch((err) => {
         console.log(err);
     });
     if (data) {
-        await Music.findOne( {deezer: id} ).then(async(music) => {
+        await Music.findOne( {deezer: id} ).then( (music) => {
             res = {
                 statut: 200,
                 data: {
                     uuid:       music._id,
                     deezer:     music.deezer,
-                    duration:   music.duration,
+                    duration:   (new Date(music.duration * 1000).toISOString().substr(15, 4)),
                     title:      music.title,
                     group:      music.group,
                     cover:      music.image,
@@ -56,7 +57,7 @@ const addNewTrackByName = async (name) => {
                 musicList.push({
                     uuid:       music._id,
                     deezer:     music.deezer,
-                    duration:   music.duration,
+                    duration:   (new Date(music.duration * 1000).toISOString().substr(15, 4)),
                     title:      music.title,
                     group:      music.group,
                     cover:      music.image,
@@ -72,7 +73,7 @@ const addNewTrackByName = async (name) => {
                     musicList.push({
                         uuid:       addMusic.data.uuid,
                         deezer:     addMusic.data.deezer,
-                        duration:   addMusic.data.duration,
+                        duration:   (new Date(addMusic.data.duration * 1000).toISOString().substr(15, 4)),
                         title:      addMusic.data.title,
                         group:      addMusic.data.group,
                         cover:      addMusic.data.image,
@@ -93,14 +94,14 @@ const addNewTrackByName = async (name) => {
 router.get('/all', authentified, async (req, res) => {
     const limit = req.query.limit ? parseInt(req.query.limit) : 0;
     var count   = Math.floor(Math.random() * await Music.countDocuments());
-    Music.find( {} ).limit(limit).skip(count).then(async(music) => {
+    await Music.find( {} ).limit(limit).skip(count).then(async(music) => {
         var musicList = [];
         if (music) {
             music.forEach(el => {
                 musicList.push({
                     uuid:       el._id,
                     deezer:     el.deezerid,
-                    duration:   el.duration,
+                    duration:   (new Date(el.duration * 1000).toISOString().substr(15, 4)),
                     title:      el.title,
                     group:      el.group,
                     cover:      el.image,
@@ -120,7 +121,7 @@ router.get('/all', authentified, async (req, res) => {
 
 router.get('/search', authentified, async (req, res) => {
     const name  = req.query.name;
-    if (name && name.length > 3) {
+    if (name && name.length >= 3) {
         var musicList = await addNewTrackByName(name);
         res.json({statut: 200, res: musicList})
     } else {
@@ -135,7 +136,7 @@ router.get('/:id', authentified, (req, res) => {
             res.json({statut: 200, data:{
                 uuid:       music._id,
                 deezer:     music.deezer,
-                duration:   music.duration,
+                duration:   (new Date(music.duration * 1000).toISOString().substr(15, 4)),
                 title:      music.title,
                 group:      music.group,
                 cover:      music.image,

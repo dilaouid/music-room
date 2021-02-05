@@ -57,7 +57,7 @@ passport.use( new facebookStrategy({
 
 router.get('/', passport.authenticate('facebook', { scope: ["public_profile", "email"] }));
 
-router.get('/callback', passport.authenticate('facebook', { failureRedirect: `http://localhost:8100/login`, scope: ["public_profile", "email"] }), (req, res) => {
+router.get('/callback', passport.authenticate('facebook', { failureRedirect: `${process.env.FRONT}/login`, scope: ["public_profile", "email"] }), (req, res) => {
     console.log('ici')
     User.findOne({ oauthID: req.user.oauthID }).then(async(user) => {
         if (!user) { return res.status(400).json({}); }
@@ -67,7 +67,7 @@ router.get('/callback', passport.authenticate('facebook', { failureRedirect: `ht
                 if (!err) {
                     res.header('Access-Control-Allow-Credentials', true);
                     res.cookie('token', token, { maxAge: 2 * 60 * 60 * 1000, secure: false,  httpOnly: false });
-                    res.redirect(`http://localhost:8100`);
+                    res.redirect(process.env.FRONT);
                 } else {
                     console.log(err)
                     return res.status(400).json({});

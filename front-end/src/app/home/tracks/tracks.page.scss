@@ -1,0 +1,17 @@
+ion-content { --background: transparent;}
+
+.rowMusicItem {
+    z-index: 2;
+    margin-bottom: 32px;
+    box-shadow: -1px -2px 16px 5px rgba(0,45,89,0.54);
+    border-style: solid;
+    border-top: 2px solid var(--blue);
+    border-right-style: none;
+    border-bottom-width: 2px;
+    border-bottom-color: var(--blue);
+    border-left-style: none;
+    color: rgb(20,20,20);
+    height: 110px;
+    background: rgba(0,0,0,0.31);
+  }
+  

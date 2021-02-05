@@ -10,11 +10,11 @@ const authentified = (req, res, next) => {
         token = req.cookies.token;
     }
     if (!token) {
-        res.status(400).send('Forbidden access: No token provided');
+        res.status(400).send({statut: 400, res:'Forbidden access: No token provided'});
     } else {
         jwt.verify(token, process.env.SECRET, async function(err, decoded) {
             if (err) {
-                res.status(400).send('Forbidden access: Provided token is invalid');
+                res.status(400).send({statut:400, res:'Forbidden access: Provided token is invalid'});
             } else {
                 res.locals.id = decoded.id;
                 next();

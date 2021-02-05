@@ -124,7 +124,7 @@ router.post('/forgot-password', async (req, res) => {
                     return res.json({statut: 204, msg: 'An error occured, please try again', alert:'danger'});
                 }
                 else {
-                    console.log('Email sent: ' + info.response);
+                    console.log('E mail sent: ' + info.response);
                     return res.json({ret: 200, msg: 'A link has been sent to your email adress to retrieve your password!', alert:'success'});
                 }
             });

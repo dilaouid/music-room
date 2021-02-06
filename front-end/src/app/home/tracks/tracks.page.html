@@ -1,41 +1,38 @@
 <ion-content [scrollEvents]="true">
+
+
+
+    
 <div id="tracks">
-  
-<div class="row no-gutters padMar" style="margin-bottom: 10px;">
-      <div class="col padMar">
-          <div class="input-group">
-              <div class="input-group-prepend"></div>
-              <input #searchTrackValue (input)='searchTrack(searchTrackValue.value)' class="form-control autocomplete" type="text" placeholder="Search for a song" style="background: rgba(17, 17, 17, 0.521);color: rgb(119,126,133);">
-          </div>
-      </div>
-  </div>
-  
-  
-<div id="searchTrackBilan" class="row no-gutters d-none" style="margin-bottom: 32px;">
-  <div class="col">
-      <h5 class="text-center text-body" style="margin-top: 17px;" id="searchTrackResults"></h5>
-  </div>
-</div>
-
-
-
-<div class="row no-gutters align-items-center rowMusicItem" data-bs-hover-animate="pulse" *ngFor="let p of tracksTrackTab" id="{{p.uuid}}">
-  <div class="col-3">
-      <img src="{{p.cover}}" style="width: 83px;">
-  </div>
-  <div class="col-6" style="margin-top: 11px;">
-      <p style="font-size: 13px;color: var(--gray);"> <i class="fas fa-users"></i>
-      <strong> {{p.group[0].name}}</strong><br> 
-      <i class="fas fa-music"></i> 
-      <em> {{p.title}}</em><br> 
-      <i class="far fa-clock"></i> {{p.duration}}</p>
-  </div>
-
-  <div class="col-2 text-right" style="margin-top: 11px;">
-      <p style="font-size: 13px;color: var(--gray);"><i class="far fa-list-alt"></i> {{p.playlists.length}}</p>
-  </div>
-
-</div>
+    <div class="row no-gutters padMar" style="margin-bottom: 10px;">
+        <div class="col padMar">
+            <div class="input-group">
+                <div class="input-group-prepend"></div>
+                <input #searchTrackValue class="form-control autocomplete" type="text" placeholder="Search for a song" style="background: rgba(17, 17, 17, 0.521);color: rgb(119,126,133);">
+                <div (click)='searchTrack(searchTrackValue.value)' class="input-group-append"><button class="btn btn-dark" type="button"><i class="fa fa-search"></i></button></div>
+            </div>
+        </div>
+    </div>
+    <div id="searchTrackBilan" class="row no-gutters d-none" style="margin-bottom: 32px;">
+    <div class="col">
+        <h5 class="text-center text-body" style="margin-top: 17px;" id="searchTrackResults"></h5>
+    </div>
+    </div>
+    <div class="row no-gutters align-items-center rowMusicItem" data-bs-hover-animate="pulse" *ngFor="let p of tracksTrackTab" id="{{p.uuid}}">
+    <div class="col-3">
+        <img src="{{p.cover}}" style="width: 83px;">
+    </div>
+    <div class="col-6" style="margin-top: 11px;">
+        <p style="font-size: 13px;color: var(--gray);"> <i class="fas fa-users"></i>
+        <strong> {{p.group}}</strong><br> 
+        <i class="fas fa-music"></i> 
+        <em> {{p.title}}</em><br> 
+        <i class="far fa-clock"></i> {{p.duration}}</p>
+    </div>
+    <div class="col-2 text-right" style="margin-top: 11px;">
+        <p style="font-size: 13px;color: var(--gray);"><i class="far fa-list-alt"></i> {{p.playlists.length}}</p>
+    </div>
+    </div>
 </div>
 
 </ion-content>

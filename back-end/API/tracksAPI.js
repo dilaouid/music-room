@@ -13,7 +13,7 @@ const spotifyApi = new SpotifyWebApi({
 
 spotifyApi.setAccessToken(process.env.ACCESS_TOKEN);
 
-const convertTime(millis => {
+const convertTime = (millis => {
     var minutes = Math.floor(millis / 60000);
     var seconds = ((millis % 60000) / 1000).toFixed(0);
     return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
@@ -29,6 +29,7 @@ const addMusicToDB = async (el, searchForMusic) => {
             group:      el.artists[0].name,
             date:       el.album.release_date,
             image:      el.album.images[0].url,
+            url:        el.preview_url,
             duration:   convertTime(el.duration_ms)
         };
     } else {
@@ -39,6 +40,7 @@ const addMusicToDB = async (el, searchForMusic) => {
                 group:      resp.body.artists[0].name,
                 date:       resp.body.album.release_date,
                 image:      resp.body.album.images[0].url,
+                url:        resp.body.preview_url,
                 duration:   convertTime(resp.body.duration_ms)
             };
             return (data);
@@ -57,6 +59,7 @@ const addMusicToDB = async (el, searchForMusic) => {
                     group:      music.group,
                     cover:      music.image,
                     date:       music.date,
+                    url:        music.url,
                     likes:      0,
                     dislikes:   0,
                     playlists:  [],
@@ -84,6 +87,7 @@ const addNewTrackByName = async (name) => {
                     group:      music.group,
                     cover:      music.image,
                     date:       music.date,
+                    url:        music.url,
                     likes:      music.likes    == undefined ? 0 : music.likes.length,
                     dislikes:   music.dislikes == undefined ? 0 : music.dislikes.length,
                     playlists:  music.inPlaylists,
@@ -91,7 +95,7 @@ const addNewTrackByName = async (name) => {
                 });
             } else {
                 addMusic = await addMusicToDB(el, false);
-                if (addMusic.data)
+                if (addMusic.data) {
                     musicList.push({
                         uuid:       addMusic.data.uuid,
                         spotify:    addMusic.data.spotify,
@@ -100,14 +104,16 @@ const addNewTrackByName = async (name) => {
                         group:      addMusic.data.group,
                         cover:      addMusic.data.image,
                         date:       addMusic.data.date,
+                        url:        addMusic.data.url,
                         likes:      0,
                         dislikes:   0,
                         playlists:  addMusic.data.playlists,
                         looped:     addMusic.data.looped
                     });
+                }
             }
             }).catch (err => {
-                console.log(err);
+                /* console.log(err); */
             });
     }
     return (musicList);
@@ -138,6 +144,7 @@ router.get('/all', authentified, async (req, res) => {
                     group:      el.group,
                     cover:      el.image,
                     release:    el.date,
+                    url:        el.url,
                     likes:      el.likes.length,
                     dislikes:   el.dislikes.length,
                     playlists:  el.inPlaylists,
@@ -151,7 +158,7 @@ router.get('/all', authentified, async (req, res) => {
     });
 });
 
-router.get('/search', async (req, res) => {
+router.get('/search', authentified, async (req, res) => {
     const name  = req.query.name;
     if (name && name.length >= 3) {
         var musicList = await addNewTrackByName(name);
@@ -161,7 +168,7 @@ router.get('/search', async (req, res) => {
     }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', authentified, (req, res) => {
     const id = req.params.id;
     Music.findOne( {spotify: id} ).then(async(music) => {
         if (music) {
@@ -173,6 +180,7 @@ router.get('/:id', (req, res) => {
                 group:      music.group,
                 cover:      music.image,
                 release:    music.date,
+                url:        music.url,
                 likes:      music.likes    == undefined ? 0 : music.likes.length,
                 dislikes:   music.dislikes == undefined ? 0 : music.dislikes.length,
                 playlists:  music.inPlaylists,

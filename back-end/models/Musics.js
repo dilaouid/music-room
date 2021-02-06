@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const musicSchema = new mongoose.Schema({
-    deezer: {
-        type: Number,
+    spotify: {
+        type: String,
         required: true
     },
     title: {
@@ -10,7 +10,7 @@ const musicSchema = new mongoose.Schema({
         required: true
     },
     group: {
-        type: Array,
+        type: String,
         required: true
     },
     date:{

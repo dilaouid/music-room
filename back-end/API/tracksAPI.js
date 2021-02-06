@@ -2,34 +2,51 @@ const express       = require('express');
 const router        = express.Router();
 const Music         = require("../models/Musics");
 const authentified  = require("../middleware/auth");
-const axios         = require('axios');
-const deezerURL     = 'https://api.deezer.com';
+const SpotifyWebApi = require('spotify-web-api-node');
 
-const addMusicToDB = async (id) => {
+const spotifyApi = new SpotifyWebApi({
+    clientId:       process.env.SPOTIFY_ID,
+    clientSecret:   process.env.SPOTIFY_SECRET,
+    redirectUri:    `http://localhost:${process.env.PORT}/callback`,
+    accessToken:    process.env.ACCESS_TOKEN
+});
+
+spotifyApi.setAccessToken(process.env.ACCESS_TOKEN);
+
+const addMusicToDB = async (el, searchForMusic) => {
     var data;
     var res = { statut: 400, data: 'An error occured' };
-    data = await axios.get(`${deezerURL}/track/${id}`).then( async (res) => {
+    if (searchForMusic == true) {
         data = {
-            deezer:     res.data.id,
-            title:      res.data.title,
-            group:      res.data.artist,
-            date:       res.data.release_date,
-            image:      res.data.album.cover,
-            duration:   (new Date(res.data.duration * 1000).toISOString().substr(15, 4))
+            spotify:    el.id,
+            title:      el.name,
+            group:      el.artists[0].name,
+            date:       el.album.release_date,
+            image:      el.album.images[0].url,
+            duration:   new Date(el.duration_ms * 1000).toISOString().substr(15, 4)
         };
+    } else {
+        data = await spotifyApi.getTrack(el.id).then(resp => {
+            data = {
+                spotify:    resp.body.id,
+                title:      resp.body.name,
+                group:      resp.body.artists[0].name,
+                date:       resp.body.album.release_date,
+                image:      resp.body.album.images[0].url,
+                duration:   new Date(resp.body.duration_ms * 1000).toISOString().substr(15, 4)
+            };
+            return (data);
+        });
         await new Music(data).save();
-        return data;
-    }).catch((err) => {
-        console.log(err);
-    });
+    }
     if (data) {
-        await Music.findOne( {deezer: id} ).then( (music) => {
+        await Music.findOne( {spotify: data.spotify} ).then( (music) => {
             res = {
                 statut: 200,
                 data: {
                     uuid:       music._id,
-                    deezer:     music.deezer,
-                    duration:   (new Date(music.duration * 1000).toISOString().substr(15, 4)),
+                    spotify:    music.spotify,
+                    duration:   music.duration,
                     title:      music.title,
                     group:      music.group,
                     cover:      music.image,
@@ -46,18 +63,17 @@ const addMusicToDB = async (id) => {
 }
 
 const addNewTrackByName = async (name) => {
-    var   data = await axios.get(`${deezerURL}/search?q=${name}&strict=on`);
-    data = data.data;
+    var data          = await spotifyApi.searchTracks(`track:${name}`).then(data => { return (data.body.tracks.items); });
     var     musicList = [];
     var     addMusic;
-    for (let i = 0; i < data.data.length; i++) {
-        const el = data.data[i];
-        await Music.findOne( {deezer: el.id }).then( async (music) => {
+    for (let i = 0; i < data.length; i++) {
+        const el = data[i];
+        await Music.findOne( {spotify: el.id }).then( async (music) => {
             if (music) {
                 musicList.push({
                     uuid:       music._id,
-                    deezer:     music.deezer,
-                    duration:   (new Date(music.duration * 1000).toISOString().substr(15, 4)),
+                    spotify:    music.spotify,
+                    duration:   music.duration,
                     title:      music.title,
                     group:      music.group,
                     cover:      music.image,
@@ -68,12 +84,12 @@ const addNewTrackByName = async (name) => {
                     looped:     music.listened
                 });
             } else {
-                addMusic = await addMusicToDB(el.id);
+                addMusic = await addMusicToDB(el, false);
                 if (addMusic.data)
                     musicList.push({
                         uuid:       addMusic.data.uuid,
-                        deezer:     addMusic.data.deezer,
-                        duration:   (new Date(addMusic.data.duration * 1000).toISOString().substr(15, 4)),
+                        spotify:    addMusic.data.spotify,
+                        duration:   addMusic.data.duration,
                         title:      addMusic.data.title,
                         group:      addMusic.data.group,
                         cover:      addMusic.data.image,
@@ -91,6 +107,16 @@ const addNewTrackByName = async (name) => {
     return (musicList);
 };
 
+router.get('/test', (req, res) => {
+    /* spotifyApi.searchTracks('track: Boulevard of Broken Dreams', {limit: 1}) */
+    spotifyApi.getTrack('1hwJKpe0BPUsq6UUrwBWTw')
+    .then(function(data) {
+        res.send(data.body);
+    }, function(err) {
+    res.send(err);
+    });
+});
+
 router.get('/all', authentified, async (req, res) => {
     const limit = req.query.limit ? parseInt(req.query.limit) : 0;
     var count   = Math.floor(Math.random() * await Music.countDocuments());
@@ -100,8 +126,8 @@ router.get('/all', authentified, async (req, res) => {
             music.forEach(el => {
                 musicList.push({
                     uuid:       el._id,
-                    deezer:     el.deezerid,
-                    duration:   (new Date(el.duration * 1000).toISOString().substr(15, 4)),
+                    spotify:    el.spotify,
+                    duration:   el.duration,
                     title:      el.title,
                     group:      el.group,
                     cover:      el.image,
@@ -119,7 +145,7 @@ router.get('/all', authentified, async (req, res) => {
     });
 });
 
-router.get('/search', authentified, async (req, res) => {
+router.get('/search', async (req, res) => {
     const name  = req.query.name;
     if (name && name.length >= 3) {
         var musicList = await addNewTrackByName(name);
@@ -129,25 +155,25 @@ router.get('/search', authentified, async (req, res) => {
     }
 });
 
-router.get('/:id', authentified, (req, res) => {
+router.get('/:id', (req, res) => {
     const id = req.params.id;
-    Music.findOne( {deezer: id} ).then(async(music) => {
+    Music.findOne( {spotify: id} ).then(async(music) => {
         if (music) {
             res.json({statut: 200, data:{
                 uuid:       music._id,
-                deezer:     music.deezer,
-                duration:   (new Date(music.duration * 1000).toISOString().substr(15, 4)),
+                spotify:    music.spotify,
+                duration:   music.duration,
                 title:      music.title,
                 group:      music.group,
                 cover:      music.image,
                 release:    music.date,
-                likes:      music.likes == undefined    ? 0 : music.likes.length,
+                likes:      music.likes    == undefined ? 0 : music.likes.length,
                 dislikes:   music.dislikes == undefined ? 0 : music.dislikes.length,
                 playlists:  music.inPlaylists,
                 looped:     music.listened
             }});
         } else {
-            var data = await addMusicToDB(id);
+            var data = await addMusicToDB(id, true);
             res.json({statut: data.statut, data: data.data})
         }
     }).catch(err =>  {

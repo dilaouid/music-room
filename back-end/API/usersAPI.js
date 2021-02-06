@@ -1,5 +1,6 @@
 const express       = require('express');
 const router        = express.Router();
+const jwt           = require('jsonwebtoken')
 const User          = require("../models/Users");
 const authentified  = require("../middleware/auth");
 const getInfos      = require("../func/getInfos");
@@ -28,7 +29,16 @@ router.get('/', authentified, (req, res) => {
 });
 
 router.get('/valid-token', authentified, (req, res) => {
-    res.json({statut: 200, res:'OK'})
+    if (!req.cookies.token) {
+        res.status(400).send({statut: 400, res:'Forbidden access: No token provided'});
+    } else {
+        jwt.verify(req.cookies.token, process.env.SECRET, async function(err, decoded) {
+            if (err) {
+                res.status(400).send({statut:400, res:'Forbidden access: Provided token is invalid'});
+            }
+        });
+    }
+    res.status(200).send({statut:200, res:'OK'});
 });
 
 router.get('/me', authentified, async (req, res) => {

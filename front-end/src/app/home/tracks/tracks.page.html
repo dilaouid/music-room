@@ -1,9 +1,30 @@
 <ion-content [scrollEvents]="true">
 
+<div id="listenToTrack">
+    <div class="img_box">
+        <img src="">
+    </div>
+    <div id="container">
+        <h2>Chapitre 3</h2>
+        <ion-range min="0" max="100" value="40" mode="md" color="warning"></ion-range>
+        <p>--:--</p>
+    </div>
+    <div class="flex_box">
+        <ion-button fill="clear" color="light">
+          <ion-icon slot="icon-only" name="play-back"></ion-icon>
+        </ion-button>
+        <ion-button shape="round" color="light">
+          <ion-icon slot="icon-only" name="pause"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" color="light">
+          <ion-icon slot="icon-only" name="play-forward"></ion-icon>
+        </ion-button>
+      </div>
+      
+</div>
 
 
-    
-<div id="tracks">
+<div id="tracks" class='d-none'>
     <div class="row no-gutters padMar" style="margin-bottom: 10px;">
         <div class="col padMar">
             <div class="input-group">

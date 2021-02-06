@@ -37,7 +37,7 @@
               "src/assets/css/background.css",
               "src/theme/variables.scss",
               "src/global.scss"],
-            "scripts": ["node_modules/jquery/dist/jquery.min.js"]
+            "scripts": []
           },
           "configurations": {
             "production": {

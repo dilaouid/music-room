@@ -13,6 +13,12 @@ const spotifyApi = new SpotifyWebApi({
 
 spotifyApi.setAccessToken(process.env.ACCESS_TOKEN);
 
+const convertTime(millis => {
+    var minutes = Math.floor(millis / 60000);
+    var seconds = ((millis % 60000) / 1000).toFixed(0);
+    return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+});
+
 const addMusicToDB = async (el, searchForMusic) => {
     var data;
     var res = { statut: 400, data: 'An error occured' };
@@ -23,7 +29,7 @@ const addMusicToDB = async (el, searchForMusic) => {
             group:      el.artists[0].name,
             date:       el.album.release_date,
             image:      el.album.images[0].url,
-            duration:   new Date(el.duration_ms * 1000).toISOString().substr(15, 4)
+            duration:   convertTime(el.duration_ms)
         };
     } else {
         data = await spotifyApi.getTrack(el.id).then(resp => {
@@ -33,7 +39,7 @@ const addMusicToDB = async (el, searchForMusic) => {
                 group:      resp.body.artists[0].name,
                 date:       resp.body.album.release_date,
                 image:      resp.body.album.images[0].url,
-                duration:   new Date(resp.body.duration_ms * 1000).toISOString().substr(15, 4)
+                duration:   convertTime(resp.body.duration_ms)
             };
             return (data);
         });

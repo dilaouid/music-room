@@ -18,45 +18,21 @@ export class HomePage implements OnInit {
 
   constructor(private cookieService: CookieService, private route: ActivatedRoute, private router: Router) {
     this.cookie = this.cookieService.get('token');
+    if (!this.cookie) {
+      this.router.navigateByUrl('/login');
+      $('#homepage').remove();
+    } else {
     axios({url: `${environment.backEndUrl}/api/users/valid-token`, method: 'get', withCredentials: true})
+      .then(res => {
+        console.log(res.data)
+      })
       .catch(err => {
           this.router.navigateByUrl('/login');
           $('#homepage').remove();
-      });
+      })
+    }
   }
 
   ngOnInit() {
-  }
-
-  public goToEvents()
-  {
-    $('#events').removeClass('d-none');
-    $('#profile').hasClass('d-none') ? '' : $('#profile').addClass('d-none');
-    $('#tracks').hasClass('d-none') ? '' : $('#tracks').addClass('d-none');
-    $('#playlists').hasClass('d-none') ? '' : $('#playlists').addClass('d-none');
-  }
-
-  public goToTracks()
-  {
-    $('#events').hasClass('d-none') ? '' : $('#events').addClass('d-none');
-    $('#profile').hasClass('d-none') ? '' : $('#profile').addClass('d-none');
-    $('#tracks').removeClass('d-none');
-    $('#playlists').hasClass('d-none') ? '' : $('#playlists').addClass('d-none');
-  }
-
-  public goToProfile()
-  {
-    $('#events').hasClass('d-none') ? '' : $('#events').addClass('d-none');
-    $('#profile').removeClass('d-none');
-    $('#tracks').hasClass('d-none') ? '' : $('#tracks').addClass('d-none');
-    $('#playlists').hasClass('d-none') ? '' : $('#playlists').addClass('d-none');
-  }
-
-  public goToPlaylists()
-  {
-    $('#events').hasClass('d-none') ? '' : $('#events').addClass('d-none');
-    $('#profile').hasClass('d-none') ? '' : $('#profile').addClass('d-none');
-    $('#tracks').hasClass('d-none') ? '' : $('#tracks').addClass('d-none');
-    $('#playlists').removeClass('d-none');
   }
 }

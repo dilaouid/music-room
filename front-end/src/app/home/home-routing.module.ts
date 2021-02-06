@@ -74,11 +74,11 @@ const routes: Routes = [
     path: '',
     redirectTo: '/tracks'
   },
-  {
+  /* {
     path: 'login',
     loadChildren: () => import('../login/login.module').then( m => m.LoginPageModule),
     pathMatch: 'full'
-  }
+  } */
 ];
 
 @NgModule({

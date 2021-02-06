@@ -54,6 +54,7 @@ export class LoginPage implements OnInit {
                   } else {
                     /* REDIRECT AFTER LOGIN */
                     console.log('success login');
+                    this.router.navigateByUrl('/');
                   }
               });
       }

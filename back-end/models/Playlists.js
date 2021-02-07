@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const playlistSchema = new mongoose.Schema({
-    user: {
-        type: String,
+    admins: {
+        type: Array,
         required: true
     },
     name: {

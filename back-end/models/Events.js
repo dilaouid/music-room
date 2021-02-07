@@ -41,6 +41,10 @@ const eventSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    currentMusic:{
+        type: String,
+        default: ''
+    },
     poll: {
         type: Array,
         default: []

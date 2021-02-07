@@ -10,16 +10,17 @@ const sanitize      = require("mongo-sanitize");
 const bodyParser    = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
-router.get('/playlists', authentified, (req, res) => {
+router.get('/playlists', authentified, async (req, res) => {
     const token = req.cookies.token;
+    const user = await getInfos(token);
     Playlist.find( {}, {date: 0} ).then(async(playlist) => {
         var playlistAll = [];
         if (playlist) {
             playlist.forEach(el => {
-                if ((el.private == true && el.user == token) || (el.private == false) ){
+                if ((el.private == true && el.admins.includes(user.id)) || (el.private == false) ){
                     playlistAll.push({
                         uuid: el._id,
-                        creator: el.user,
+                        admins: el.admins,
                         tracks: el.tracks,
                         likes: el.likes.length,
                         dislikes: el.dislikes.length,
@@ -36,20 +37,21 @@ router.get('/playlists', authentified, (req, res) => {
     });
 });
 
-router.get('/playlists/:id', authentified, (req, res) => {
+router.get('/playlists/:id', authentified, async (req, res) => {
     const id = req.params.id;
     const token = req.cookies.token;
+    const user = await getInfos(token);
     Playlist.findById( id ).then(async(playlist) => {
-        if (playlist && ( (playlist.private == true && playlist.user == token) || playlist.private == false) ) {
+        if (playlist && ( (playlist.private == true && playlist.admins.includes(user.id)) || playlist.private == false) ) {
             res.json({statut: 200, data:{
                 uuid: playlist._id,
-                creator: playlist.user,
+                admins: playlist.admins,
                 tracks: playlist.tracks,
                 likes: playlist.likes.length,
                 dislikes: playlist.dislikes.length,
                 events: playlist.inEvents
             }});
-        } else if(playlist.private == true && playlist.user == token) {
+        } else if(playlist.private == true && !playlist.admins.includes(user.id)) {
             res.json({statut: 403, res:'Access denied'})
         } else {
             res.json({statut: 400, res:'Playlist not found'})
@@ -63,17 +65,16 @@ router.post('/new', urlencodedParser, authentified, async (req, res) => {
     const token         = req.cookies.token;
     const valid         = validation.playlists(req.body);
     var userid          = await getInfos(token);
-    console.log(userid)
     if (valid.isValid == false) { res.json({ statut: 400, res:valid.errors }); }
     const newPlaylist = await new Playlist({
-        user: userid.id,
+        user: [userid.id],
         name: sanitize(req.body.name)
     }).save();
     User.findByIdAndUpdate(userid.id, { $push: { playlists:  newPlaylist._id } }, (err, model) => {
         console.log(err);
     })
     res.json({statut: 200, data:{
-        user: userid.id,
+        user: [userid.id],
         name: sanitize(req.body.name)
     }});
 });
@@ -89,7 +90,7 @@ router.post('/update', urlencodedParser, authentified, async (req, res) => {
     });
     if (playlist == null) {
         res.json({statut: 400, res:'Playlist not found'})
-    } else if (playlist.user != userid) {
+    } else if (!playlist.admins.includes(userid)) {
         res.json({statut: 403, res:'Access denied'});
     } else {
         var music = await Music.findById(musicID).then(data => {

@@ -116,8 +116,8 @@ router.post('/update', urlencodedParser, authentified, async (req, res) => {
     })
     if (check == false) { return res.json({statut: 400, res:'Access denied'}); }
     if (!valid.isValid) { return res.json({statut: 400, res:valid.errors });   }
-    var membersParsed = req.body.members.length > 0 ? req.body.members.replace(/ /g,',').split(',') : [username];
-    var adminsParsed  = req.body.admins.length  > 0 ? req.body.admins.replace(/ /g,',').split(',')  : [username];
+    var membersParsed = req.body.members.length > 0 ? req.body.members.replace(/ /g,' ').split(' ') : [username];
+    var adminsParsed  = req.body.admins.length  > 0 ? req.body.admins.replace(/ /g,' ').split(' ')  : [username];
     adminsParsed.forEach(el => { !membersParsed.includes(el) && el ? membersParsed.push(el) : ''; });
     var membersID   = [userid];
     var adminsID    = [userid];
@@ -158,8 +158,8 @@ router.post('/new', urlencodedParser, authentified, async (req, res) => {
     var username        = infos.username;
     var userid          = infos.id;
     if (!valid.isValid) { res.json({ statut: 400, res:valid.errors }); }
-    var membersParsed = req.body.members.length > 0 ? req.body.members.replace(/ /g,',').split(',') : [username];
-    var adminsParsed  = req.body.admins.length > 0 ? req.body.admins.replace(/ /g,',').split(',') : [username];
+    var membersParsed = req.body.members.length > 0 ? req.body.members.replace(/ /g,' ').split(' ') : [username];
+    var adminsParsed  = req.body.admins.length > 0 ? req.body.admins.replace(/ /g,' ').split(' ') : [username];
     adminsParsed.forEach(el => { !membersParsed.includes(el) && el ? membersParsed.push(el) : ''; });
     var membersID   = [userid];
     var adminsID    = [userid];

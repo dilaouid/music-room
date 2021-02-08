@@ -18,10 +18,10 @@ export class TracksPage implements OnInit {
 
   public  tracksTrackTab;
   public  searchTrackValue;
-  public  playingTrack:any = {id: 0, liked: false, name: null, url: null, cover: null, group: null};
+  public  playingTrack:any = {uuid: null, id: 0, liked: false, name: null, url: null, cover: null, group: null};
   public  playIcon:boolean = false;
   public  audio;
-
+  public  playlistsToAddTrack = [];
 
   private objectToArray = (obj => {
     var arr =[];
@@ -45,6 +45,16 @@ export class TracksPage implements OnInit {
           $('#searchTrackResults').html(`${res.data.res.length} results for " ${track} "`)
       });
     }
+  }
+
+  public async addToPlaylist(playlistID:string, uuid:string)
+  {
+    await axios({url: `${environment.backEndUrl}/api/playlists/add/${playlistID}/${uuid}`, method: 'get', withCredentials: true})
+      .then(res => {
+        if (res.data.statut == 200) {
+           $(`#row_${uuid}`).remove();
+        }
+    })
   }
 
   private playSong()
@@ -109,12 +119,35 @@ export class TracksPage implements OnInit {
     this.audio.pause();
   }
 
+
+  public async openModal()
+  {
+    await axios({url: `${environment.backEndUrl}/api/playlists/me`, method: 'get', withCredentials: true})
+    .then(res => {
+      this.playlistsToAddTrack = res.data.data;
+    });
+    for (let i = 0; i < this.playlistsToAddTrack.length; i++) {
+      if (this.playlistsToAddTrack[i].tracks.includes(this.playingTrack.uuid)) {
+        this.playlistsToAddTrack.splice(i, 1);
+      }
+    }
+    $('#addToPlaylist').show()
+    $('#addToPlaylist').modal("show");
+  }
+
+  public closeModal()
+  {
+    $('#addToPlaylist').hide()
+    $('#addToPlaylist').modal("hide");
+  }
+
   public async playMusic(id:string)
   {
     await axios({url: `${environment.backEndUrl}/api/tracks/${id}`, method: 'get', withCredentials: true})
       .then(res => {
         this.playingTrack = {
           id: id,
+          uuid: res.data.data.uuid,
           name: res.data.data.title,
           cover: res.data.data.cover,
           group: res.data.data.group,

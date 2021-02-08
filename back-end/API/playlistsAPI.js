@@ -10,7 +10,7 @@ const sanitize      = require("mongo-sanitize");
 const bodyParser    = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
-router.get('/playlists', authentified, async (req, res) => {
+router.get('/', authentified, async (req, res) => {
     const token = req.cookies.token;
     const user = await getInfos(token);
     Playlist.find( {}, {date: 0} ).then(async(playlist) => {
@@ -36,7 +36,20 @@ router.get('/playlists', authentified, async (req, res) => {
     });
 });
 
-router.get('/playlists/:id', authentified, async (req, res) => {
+router.get('/me', authentified, async (req, res) => {
+    const token = req.cookies.token;
+    const user = await getInfos(token);
+    const userid = user.id;
+    await Playlist.find( {"admins": { $elemMatch: { $eq: userid } }}, {date: 0} ).then(data => {
+        if (data) {
+            res.json({statut: 200, data: data});
+        } else {
+            res.json({statut: 400, res:'No playlist'})
+        }
+    })
+});
+
+router.get('/:id', authentified, async (req, res) => {
     const id = req.params.id;
     const token = req.cookies.token;
     const user = await getInfos(token);
@@ -59,30 +72,34 @@ router.get('/playlists/:id', authentified, async (req, res) => {
     });
 });
 
+
 router.post('/new', urlencodedParser, authentified, async (req, res) => {
     const token         = req.cookies.token;
     const valid         = validation.playlists(req.body);
     var userid          = await getInfos(token);
     if (valid.isValid == false) { res.json({ statut: 400, res:valid.errors }); }
     const newPlaylist = await new Playlist({
-        user: [userid.id],
-        name: sanitize(req.body.name)
+        admins: [userid.id],
+        name:   sanitize(req.body.name),
+        tracks: [],
+        likes: [],
+        inEvents: []
     }).save();
-    User.findByIdAndUpdate(userid.id, { $push: { playlists:  newPlaylist._id } }, (err, model) => {
+    User.findByIdAndUpdate(userid.id, { $push: { playlists:  newPlaylist._id.toString() } }, (err, model) => {
         console.log(err);
     })
     res.json({statut: 200, data:{
-        user: [userid.id],
-        name: sanitize(req.body.name)
+        admins: [userid.id],
+        name:   sanitize(req.body.name)
     }});
 });
 
-router.post('/update', urlencodedParser, authentified, async (req, res) => {
+router.get('/add/:id/:track', authentified, async (req, res) => {
     const   token         = req.cookies.token;
+    const   playlistID    = req.params.id;
+    const   musicID       = req.params.track;
     var     infos         = await getInfos(token);
     var     userid        = infos.id;
-    const   playlistID    = req.body.playlist;
-    const   musicID       = req.body.music;
     var playlist = await Playlist.findById(playlistID).then(data => {
         if (data) { return (data); }
     });
@@ -102,6 +119,32 @@ router.post('/update', urlencodedParser, authentified, async (req, res) => {
             await Playlist.updateOne({"_id": playlistID}, { $push: { tracks:  musicID } });
             console.log(`${musicID} added to ${playlistID}`);
         }
+        res.json({statut: 200, res:'OK'});
+    }
+});
+
+router.post('/update', urlencodedParser, authentified, async (req, res) => {
+    const   token         = req.cookies.token;
+    var     infos         = await getInfos(token);
+    var     userid        = infos.id;
+    var     username      = infos.username;
+    const   playlistID    = req.body.playlist;
+    var playlist = await Playlist.findById(playlistID).then(data => {
+        if (data) { return (data); }
+    });
+    if (playlist == null) {
+        res.json({statut: 400, res:'Playlist not found'})
+    } else if (!playlist.admins.includes(userid)) {
+        res.json({statut: 403, res:'Access denied'});
+    } else {
+        var adminsParsed  = req.body.admins.length  > 0 ? req.body.admins.replace(/ /g,' ').split(' ')  : [username];
+        var adminsID      = [userid];
+        for (let i = 0; i < adminsParsed.length; i++) {
+            await User.findOne({username : adminsParsed[i]}, (err, data) => {
+                if (data._id != userid) { adminsID.push(data._id.toString()); }
+            });
+        }
+        await Playlist.updateOne({"_id": playlistID}, { private: req.body.private, name: req.body.name, admins: adminsID });
         res.json({statut: 200, res:'OK' });
     }
 });

@@ -43,7 +43,7 @@ img {
   width: 100%;
   max-width: 90%;
   margin: 0 auto;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .icons {
@@ -151,13 +151,13 @@ img {
   margin-bottom: -50px
 }
 
-.repeat-btns span {
+.play-btns .item {
   color: #fff;
-  margin: 0 40px;
+  /* margin: 0 40px; */
   font-size: 1.3em;
 }
 
-.repeat-btns button {
+.play-btns button {
   width: 30px;
   height: 30px;
   border: none;
@@ -171,7 +171,7 @@ img {
   transition: all 0.3s;
 }
 
-.repeat-btns button:hover{
+.play-btns button:hover{
   background: #ff0634;
   color:#fff;
 }

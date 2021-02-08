@@ -73,7 +73,7 @@ const addMusicToDB = async (el, searchForMusic) => {
 }
 
 const addNewTrackByName = async (name) => {
-    var data          = await spotifyApi.searchTracks(`track:${name}`).then(data => { return (data.body.tracks.items); });
+    var data          = await spotifyApi.searchTracks(`${name}`, { limit: 50 }).then(data => { return (data.body.tracks.items); });
     var     musicList = [];
     var     addMusic;
     for (let i = 0; i < data.length; i++) {
@@ -210,6 +210,7 @@ router.get('/:id/like', authentified, async (req, res) => {
                 us.save();
             })
             music.save();
+            console.log(`${user.username} liked or disliked '${music.title}'`)
             res.json({statut: 200, data:'OK'});
         } else {
             var data = await addMusicToDB(id, true);

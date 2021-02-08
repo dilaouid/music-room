@@ -2,6 +2,7 @@ const express       = require('express');
 const router        = express.Router();
 const Music         = require("../models/Musics");
 const authentified  = require("../middleware/auth");
+const getInfos      = require("../func/getInfos");
 const SpotifyWebApi = require('spotify-web-api-node');
 
 const spotifyApi = new SpotifyWebApi({
@@ -168,8 +169,10 @@ router.get('/search', authentified, async (req, res) => {
     }
 });
 
-router.get('/:id', authentified, (req, res) => {
+router.get('/:id', authentified, async (req, res) => {
     const id = req.params.id;
+    const token = req.cookies.token;
+    const user  = await getInfos(token);
     Music.findOne( {spotify: id} ).then(async(music) => {
         if (music) {
             music.listened += 1;
@@ -186,11 +189,31 @@ router.get('/:id', authentified, (req, res) => {
                 likes:      music.likes    == undefined ? 0 : music.likes.length,
                 dislikes:   music.dislikes == undefined ? 0 : music.dislikes.length,
                 playlists:  music.inPlaylists,
+                liked:      music.likes.includes(user.id),
                 looped:     music.listened
             }});
         } else {
             var data = await addMusicToDB(id, true);
             res.json({statut: data.statut, data: data.data})
+        }
+    }).catch(err =>  {
+        console.log(err)
+        return res.json({statut: 400, res:'Invalid id'});
+    });
+});
+
+router.get('/:id/like', authentified, async (req, res) => {
+    const id    = req.params.id;
+    const token = req.cookies.token;
+    const user  = await getInfos(token);
+    Music.findOne( {spotify: id} ).then(async(music) => {
+        if (music) {
+            music.likes.includes(user.id) ? music.likes.pull(user.id) : music.likes.push(user.id);
+            music.save();
+            res.json({statut: 200, data:'OK'});
+        } else {
+            var data = await addMusicToDB(id, true);
+            res.json({statut: data.statut, data: 'A sync error occured, please try again!'})
         }
     }).catch(err =>  {
         console.log(err)

@@ -18,7 +18,7 @@ export class TracksPage implements OnInit {
 
   public  tracksTrackTab;
   public  searchTrackValue;
-  public  playingTrack:any = {name: null, url: null, cover: null, group: null};
+  public  playingTrack:any = {id: 0, liked: false, name: null, url: null, cover: null, group: null};
   public  playIcon:boolean = false;
   public  audio;
 
@@ -61,6 +61,14 @@ export class TracksPage implements OnInit {
     } else {
       this.audio.pause();
     }
+  }
+
+  public likeTrack()
+  {
+    axios({url: `${environment.backEndUrl}/api/tracks/${this.playingTrack.id}/like`, method: 'get', withCredentials: true})
+      .then(res => {
+        if (res.data.statut == 200) { this.playingTrack.liked = !this.playingTrack.liked; }
+    });
   }
 
   private convertTime(seconds)
@@ -106,10 +114,12 @@ export class TracksPage implements OnInit {
     await axios({url: `${environment.backEndUrl}/api/tracks/${id}`, method: 'get', withCredentials: true})
       .then(res => {
         this.playingTrack = {
+          id: id,
           name: res.data.data.title,
           cover: res.data.data.cover,
           group: res.data.data.group,
-          url: res.data.data.url
+          url: res.data.data.url,
+          liked: res.data.data.liked
         };
     });
     $('#listenToTrack').removeClass('d-none');

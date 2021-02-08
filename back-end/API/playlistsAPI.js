@@ -23,7 +23,6 @@ router.get('/playlists', authentified, async (req, res) => {
                         admins: el.admins,
                         tracks: el.tracks,
                         likes: el.likes.length,
-                        dislikes: el.dislikes.length,
                         events: el.inEvents
                     });
                 }
@@ -48,7 +47,6 @@ router.get('/playlists/:id', authentified, async (req, res) => {
                 admins: playlist.admins,
                 tracks: playlist.tracks,
                 likes: playlist.likes.length,
-                dislikes: playlist.dislikes.length,
                 events: playlist.inEvents
             }});
         } else if(playlist.private == true && !playlist.admins.includes(user.id)) {

@@ -6,7 +6,7 @@ const authentified  = require("../middleware/auth");
 const getInfos      = require("../func/getInfos");
 
 router.get('/', authentified, (req, res) => {
-    User.find( {}, {givenLikes: 0, givenDislikes: 0, admin: 0, oauthID: 0, password: 0, birthday: 0, hashtoken: 0, date: 0} ).then(async(user) => {
+    User.find( {}, {givenLikes: 0, admin: 0, oauthID: 0, password: 0, birthday: 0, hashtoken: 0, date: 0} ).then(async(user) => {
         var usersList = [];
         if (user) {
             user.forEach(el => {

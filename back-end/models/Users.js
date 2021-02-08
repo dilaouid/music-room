@@ -49,10 +49,6 @@ const userSchema = new mongoose.Schema({
         type: Array,
         default: []
     }, // [musicID, musicID, musicID]
-    givenDislikes: {
-        type: Array,
-        default: []
-    }, // [musicID, musicID, musicID]
     playlists: {
         type: Array,
         default: []

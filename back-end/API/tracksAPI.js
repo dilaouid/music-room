@@ -1,6 +1,7 @@
 const express       = require('express');
 const router        = express.Router();
 const Music         = require("../models/Musics");
+const User          = require("../models/Users");
 const authentified  = require("../middleware/auth");
 const getInfos      = require("../func/getInfos");
 const SpotifyWebApi = require('spotify-web-api-node');
@@ -62,7 +63,6 @@ const addMusicToDB = async (el, searchForMusic) => {
                     date:       music.date,
                     url:        music.url,
                     likes:      0,
-                    dislikes:   0,
                     playlists:  [],
                     looped:     0
                 }
@@ -90,7 +90,6 @@ const addNewTrackByName = async (name) => {
                     date:       music.date,
                     url:        music.url,
                     likes:      music.likes    == undefined ? 0 : music.likes.length,
-                    dislikes:   music.dislikes == undefined ? 0 : music.dislikes.length,
                     playlists:  music.inPlaylists,
                     looped:     music.listened
                 });
@@ -107,7 +106,6 @@ const addNewTrackByName = async (name) => {
                         date:       addMusic.data.date,
                         url:        addMusic.data.url,
                         likes:      0,
-                        dislikes:   0,
                         playlists:  addMusic.data.playlists,
                         looped:     addMusic.data.looped
                     });
@@ -147,7 +145,6 @@ router.get('/all', authentified, async (req, res) => {
                     release:    el.date,
                     url:        el.url,
                     likes:      el.likes.length,
-                    dislikes:   el.dislikes.length,
                     playlists:  el.inPlaylists,
                     looped:     el.listened
                 });
@@ -187,7 +184,6 @@ router.get('/:id', authentified, async (req, res) => {
                 release:    music.date,
                 url:        music.url,
                 likes:      music.likes    == undefined ? 0 : music.likes.length,
-                dislikes:   music.dislikes == undefined ? 0 : music.dislikes.length,
                 playlists:  music.inPlaylists,
                 liked:      music.likes.includes(user.id),
                 looped:     music.listened
@@ -209,6 +205,10 @@ router.get('/:id/like', authentified, async (req, res) => {
     Music.findOne( {spotify: id} ).then(async(music) => {
         if (music) {
             music.likes.includes(user.id) ? music.likes.pull(user.id) : music.likes.push(user.id);
+            await User.findById(user.id).then(us => {
+                us.givenLikes.includes(id) ? us.givenLikes.pull(id) : us.givenLikes.push(id);
+                us.save();
+            })
             music.save();
             res.json({statut: 200, data:'OK'});
         } else {

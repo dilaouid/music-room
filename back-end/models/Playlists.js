@@ -29,10 +29,6 @@ const playlistSchema = new mongoose.Schema({
         type: Array,
         default: []
     }, // [userID, userID, userID]
-    dislikes:{
-        type: Array,
-        default: []
-    }, // [userID, userID, userID]
 });
 
 module.exports = Playlist = mongoose.model("playlists", playlistSchema);

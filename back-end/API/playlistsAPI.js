@@ -65,13 +65,29 @@ router.get('/:id', authentified, async (req, res) => {
         } else if(playlist.private == true && !playlist.admins.includes(user.id)) {
             res.json({statut: 403, res:'Access denied'})
         } else {
-            res.json({statut: 400, res:'Playlist not found'})
+            res.json({statut: 404, res:'Playlist not found'})
         }
     }).catch(err => {
         return res.json({statut: 400, res:'Invalid id'});
     });
 });
 
+router.get('/delete/:id', authentified, async (req, res) => {
+    const id = req.params.id;
+    const token = req.cookies.token;
+    const user = await getInfos(token);
+    await Playlist.findOneAndDelete( { _id: id, "admins": { $elemMatch: { $eq: user.id } }} ).then( async data => {
+        if (data) {
+            await User.updateMany( {"playlists": {$elemMatch: {$eq: id}}}, {$pull: {playlists: id}});
+            return res.json({statut: 200, res:'OK'})
+        } else {
+            return res.json({statut: 403, res:'Access denied'})
+        }
+    }).catch(err => {
+        console.log(err);
+        return res.json({statut: 400, res:'An error occured'});
+    });
+});
 
 router.post('/new', urlencodedParser, authentified, async (req, res) => {
     const token         = req.cookies.token;

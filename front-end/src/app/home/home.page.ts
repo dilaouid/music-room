@@ -24,7 +24,6 @@ export class HomePage implements OnInit {
     } else {
     axios({url: `${environment.backEndUrl}/api/users/valid-token`, method: 'get', withCredentials: true})
       .then(res => {
-        console.log(res.data)
       })
       .catch(err => {
           this.router.navigateByUrl('/login');

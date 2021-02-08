@@ -172,6 +172,8 @@ router.get('/:id', authentified, (req, res) => {
     const id = req.params.id;
     Music.findOne( {spotify: id} ).then(async(music) => {
         if (music) {
+            music.listened += 1;
+            music.save();
             res.json({statut: 200, data:{
                 uuid:       music._id,
                 spotify:    music.spotify,

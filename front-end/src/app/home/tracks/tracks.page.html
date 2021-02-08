@@ -1,30 +1,56 @@
 <ion-content [scrollEvents]="true">
 
-<div id="listenToTrack">
-    <div class="img_box">
-        <img src="">
+<div id="listenToTrack" class="d-none">
+    <div class="player">
+        <div class="container">
+
+            <div class="icons">
+                <span><ion-icon name="reorder-three-outline"></ion-icon></span>
+                <h1>10H PlayeR</h1>
+                <span><ion-icon name="heart-outline"></ion-icon></span>
+            </div>
+
+            <div class="img">
+                <img src="{{playingTrack.cover}}">
+            </div>
+
+            <div class="title">
+                <h1>{{playingTrack.name}}</h1>
+                <p>{{playingTrack.group}}</p>
+            </div>
+
+            <div class="time">
+                00:00
+                <span></span>
+                00:30
+            </div>
+
+            <div class="seek">
+                <div class="fill"></div>
+            </div>
+
+
+        </div>
+        
+        <div class="audio-btns">
+
+            <div class="play-btns">
+                <span (click)="returnToTrackList()"><ion-icon name="arrow-undo-outline"></ion-icon></span>
+                <span class="play-pause" (click)="togglePlay()"><ion-icon [name]="playIcon ? 'play' : 'pause'"></ion-icon></span>
+                <span><ion-icon name="add-circle-outline"></ion-icon></span>
+            </div>
+
+            <div class="repeat-btns">
+                <button class="decrease" (click)="decreaseVolume()">-</button>
+                <span><ion-icon name="volume-high-outline"></ion-icon></span>
+                <button class="increase" (click)="increaseVolume()">+</button>
+            </div>
+
+        </div>
     </div>
-    <div id="container">
-        <h2>Chapitre 3</h2>
-        <ion-range min="0" max="100" value="40" mode="md" color="warning"></ion-range>
-        <p>--:--</p>
-    </div>
-    <div class="flex_box">
-        <ion-button fill="clear" color="light">
-          <ion-icon slot="icon-only" name="play-back"></ion-icon>
-        </ion-button>
-        <ion-button shape="round" color="light">
-          <ion-icon slot="icon-only" name="pause"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear" color="light">
-          <ion-icon slot="icon-only" name="play-forward"></ion-icon>
-        </ion-button>
-      </div>
-      
 </div>
 
-
-<div id="tracks" class='d-none'>
+<div id="tracks">
     <div class="row no-gutters padMar" style="margin-bottom: 10px;">
         <div class="col padMar">
             <div class="input-group">
@@ -39,7 +65,7 @@
         <h5 class="text-center text-body" style="margin-top: 17px;" id="searchTrackResults"></h5>
     </div>
     </div>
-    <div class="row no-gutters align-items-center rowMusicItem" data-bs-hover-animate="pulse" *ngFor="let p of tracksTrackTab" id="{{p.uuid}}">
+    <div class="row no-gutters align-items-center rowMusicItem" data-bs-hover-animate="pulse" *ngFor="let p of tracksTrackTab" id="{{p.uuid}}" (click)="playMusic(p.spotify)">
     <div class="col-3">
         <img src="{{p.cover}}" style="width: 83px;">
     </div>

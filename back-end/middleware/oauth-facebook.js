@@ -58,7 +58,6 @@ passport.use( new facebookStrategy({
 router.get('/', passport.authenticate('facebook', { scope: ["public_profile", "email"] }));
 
 router.get('/callback', passport.authenticate('facebook', { failureRedirect: `${process.env.FRONT}/login`, scope: ["public_profile", "email"] }), (req, res) => {
-    console.log('ici')
     User.findOne({ oauthID: req.user.oauthID }).then(async(user) => {
         if (!user) { return res.status(400).json({}); }
         const payload = { id: user.id };

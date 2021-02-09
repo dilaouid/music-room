@@ -15,16 +15,16 @@ export class PlaylistsPage implements OnInit {
   public  yourPlaylists;
   public  allPlaylists;
 
-  private tracksToPlay:Array<any>;
+  public  tracksToPlayPlaylistPage:Array<any>;
   public  playlistToDelete = {id: '', name: ''};
   public  isPrivateCreatePlaylist:boolean = false;
+  public  isPrivateEditPlaylist:boolean = false;
 
-  public  listeningPlaylist = {id: '', name: '', admin:false, liked: false}
+  public  listeningPlaylist = {id: '', name: '', admin:false, admins: [], liked: false, private:false}
   public  currentlyPlayingTrack = {cover: '', name: '', group:''};
   public  playIcon:boolean = false;
   private currentSong:number = 0;
   public  audio;
-
 
   public  allowEditPlaylist:boolean = false;
 
@@ -34,7 +34,7 @@ export class PlaylistsPage implements OnInit {
 
   private playSong()
   {
-    this.audio.src = this.tracksToPlay[this.currentSong].url;
+    this.audio.src = this.tracksToPlayPlaylistPage[this.currentSong].url;
     this.audio.play();
   }
 
@@ -98,8 +98,8 @@ export class PlaylistsPage implements OnInit {
   public previousSong()
   {
     this.audio.pause();
-    this.currentSong == 0 ? this.currentSong = this.tracksToPlay.length - 1 : this.currentSong--;
-    this.currentlyPlayingTrack = this.tracksToPlay[this.currentSong];
+    this.currentSong == 0 ? this.currentSong = this.tracksToPlayPlaylistPage.length - 1 : this.currentSong--;
+    this.currentlyPlayingTrack = this.tracksToPlayPlaylistPage[this.currentSong];
     this.audio = new Audio();
     this.playSong();
     this.audio.addEventListener("timeupdate", () => {
@@ -113,8 +113,8 @@ export class PlaylistsPage implements OnInit {
   public nextSong()
   {
     this.audio.pause();
-    this.currentSong < this.tracksToPlay.length - 1 ? this.currentSong++ : this.currentSong = 0;
-    this.currentlyPlayingTrack = this.tracksToPlay[this.currentSong];
+    this.currentSong < this.tracksToPlayPlaylistPage.length - 1 ? this.currentSong++ : this.currentSong = 0;
+    this.currentlyPlayingTrack = this.tracksToPlayPlaylistPage[this.currentSong];
     this.audio = new Audio();
     this.playSong();
     this.audio.addEventListener("timeupdate", () => {
@@ -127,29 +127,31 @@ export class PlaylistsPage implements OnInit {
 
   public async playPlaylist(id:string, tracksLen:number)
   {
+    if (tracksLen == 0) { console.log('No tracks'); return ; }
     $('#tabsExplorer').addClass('d-none');
     this.currentSong = 0;
-    if (tracksLen == 0) { console.log('No tracks'); return ; }
     var listOfTracksIDs;
-    this.tracksToPlay = await axios({url: `${environment.backEndUrl}/api/playlists/${id}`, method: 'get', withCredentials: true})
+    this.tracksToPlayPlaylistPage = await axios({url: `${environment.backEndUrl}/api/playlists/${id}`, method: 'get', withCredentials: true})
       .then(res => {
-        this.listeningPlaylist = {id: res.data.data.uuid, name: res.data.data.title, admin:res.data.data.admin, liked: res.data.data.liked};
+        this.listeningPlaylist = {id: res.data.data.uuid, name: res.data.data.title, admin:res.data.data.admin, admins: res.data.data.adminsUsername, private: res.data.data.private, liked: res.data.data.liked};
         listOfTracksIDs = res.data.data.tracks;
         return res.data.data.tracks;
     });
+    this.isPrivateEditPlaylist = this.listeningPlaylist.private;
     for (let i = 0; i < listOfTracksIDs.length; i++) {
-      this.tracksToPlay[i] = await axios({url: `${environment.backEndUrl}/api/tracks/${listOfTracksIDs[i]}`, method: 'get', withCredentials: true})
+      this.tracksToPlayPlaylistPage[i] = await axios({url: `${environment.backEndUrl}/api/tracks/${listOfTracksIDs[i]}`, method: 'get', withCredentials: true})
           .then(res => { return ({
             id: id,
             uuid: res.data.data.uuid,
             name: res.data.data.title,
             cover: res.data.data.cover,
             group: res.data.data.group,
-            url: res.data.data.url
+            url: res.data.data.url,
+            spotify: res.data.data.spotify
           });
       });
     }
-    this.currentlyPlayingTrack = this.tracksToPlay[0];
+    this.currentlyPlayingTrack = this.tracksToPlayPlaylistPage[0];
     $('#listenToPlaylist').removeClass('d-none');
     this.audio = new Audio();
     this.playSong();
@@ -221,6 +223,63 @@ export class PlaylistsPage implements OnInit {
     $('#deletePlaylistModal').modal('hide');
   }
 
+  public returnToTrack()
+  {
+    $('#editPlaylistDiv').addClass('d-none');
+    $('#listenToPlaylist').removeClass('d-none');
+    $('#alertBoxPlaylistEdit').addClass('d-none');
+    $('#alertBoxPlaylistEdit').removeClass('alert-success', 'alert-danger');
+  }
+
+  public editPlaylist()
+  {
+    $('#editPlaylistDiv').removeClass('d-none');
+    $('#listenToPlaylist').addClass('d-none');
+  }
+
+  public editPlaylistInfos()
+  {
+    $('#editPlaylistModal').modal('show');
+  }
+
+  public async removeTrackFromPlaylist(spotify:string)
+  {
+    await axios({url: `${environment.backEndUrl}/api/playlists/add/${this.listeningPlaylist.id}/${spotify}`, method: 'get', withCredentials: true})
+    .then(res => {
+      if (res.data.statut == 200) {
+         $(`#row_${spotify}`).remove();
+      }
+    });
+    this.getAllPlaylists();
+    this.getYourPlaylists();
+  }
+
+  public async editPlaylistForm(name:string, admins:string) 
+  {
+    if (name.length < 3 || name.length > 10) {
+      $('#alertBoxPlaylistEdit').removeClass('d-none');
+      $('#alertBoxPlaylistEdit').addClass('alert-danger');
+      $('#alertEditCaption').html("The name of your playlist should contains between 3 and 10 characters!");
+      return;
+    }
+    admins = admins.replace(/\s+/g, ' ');
+    $('#saveEditPlaylist').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+    await axios({url: `${environment.backEndUrl}/api/playlists/update`, method: 'post', data: {playlist: this.listeningPlaylist.id, name: name, private: this.isPrivateEditPlaylist, admins: admins}, withCredentials: true}).then(res=>{
+        $('#alertBoxPlaylistEdit').removeClass('d-none');
+        if (res.data.statut == 200) {
+          $('#alertBoxPlaylistEdit').removeClass('alert-danger');
+          $('#alertBoxPlaylistEdit').addClass('alert-success');
+          $('#alertEditCaption').html('Playlist edited successfully!');
+          this.getAllPlaylists();
+          this.getYourPlaylists();
+        } else {
+          $('#alertBoxPlaylistCreation').removeClass('alert-success');
+          $('#alertBoxPlaylistCreation').addClass('alert-danger');
+          $('#alertEditCaption').html("An error occured with the creation of the playlist");
+        }
+    });
+    $('#saveEditPlaylist').html('Save');
+  }
   async ngOnInit() {
     await this.getAllPlaylists();
     await this.getYourPlaylists();

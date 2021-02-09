@@ -1,12 +1,76 @@
 <ion-content [scrollEvents]="true">
 
+
+<div class="modal fade" role="dialog" tabindex="-1" data-backdrop="false" id="editPlaylistModal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header shadow-sm" style="background: var(--danger);">
+                <h4 class="modal-title">Edit this playlist</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label class="text-black-50">Playlist name</label>
+                        <input [value]="listeningPlaylist.name" class="shadow-sm form-control form-control-lg" type="text" name="name" required maxlength="10" minlength="3" style="border-radius: 30px;" #playlistNameEdit>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-black-50">Administrators allowed to edit the playlist (separated by a space)</label>
+                        <input [value]="listeningPlaylist.admins.toString().replace(',', ' ')" class="shadow-sm form-control form-control-lg" type="text" name="name" required style="border-radius: 30px;" #adminPlaylistEdit>
+                    </div>
+                </form>
+                <div class="form-check" style="color: darkslategrey;">
+                    <input class="form-check-input" type="checkbox" id="formCheck-1" [checked]="isPrivateEditPlaylist == true" (change)="isPrivateEditPlaylist = !isPrivateEditPlaylist">
+                    <label class="form-check-label" for="formCheck-1">Private</label>
+                </div>
+                <div id="alertBoxPlaylistEdit" class="alert d-none" role="alert">
+                    <span id="alertEditCaption"></span>
+                </div>
+            </div>
+            <div class="modal-footer shadow-lg">
+                <button class="btn btn-light" type="button" data-dismiss="modal">Close</button>
+                <button class="btn btn-primary" type="button" (click)="editPlaylistForm(playlistNameEdit.value, adminPlaylistEdit.value)" id="saveEditPlaylist">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="editPlaylistDiv" class="d-none">
+
+    <div class="row no-gutters" style="margin-top: 55px;text-align: center;margin-bottom: 27px;">
+        <div class="col">
+            <button class="btn btn-info" type="button" style="border-radius: 32px;" (click)="returnToTrack()">Return to the track</button>
+        </div>
+        <div class="col">
+            <button class="btn btn-danger" type="button" style="border-radius: 20px;" (click)="editPlaylistInfos()">Edit playlist infos</button>
+        </div>
+    </div>
+
+    <div class="row no-gutters align-items-center rowPlaylistItem" data-bs-hover-animate="pulse" *ngFor="let p of tracksToPlayPlaylistPage" id="row_{{p.spotify}}">
+        <div class="col-auto">
+            <img src="{{p.cover}}" style="width: 83px;">
+        </div>
+        <div class="col-6" style="margin-top: 11px;">
+            <p style="font-size: 13px;color: var(--gray);"> <i class="fas fa-users"></i>
+            <strong> {{p.group}}</strong><br> 
+            <i class="fas fa-music"></i> 
+            <em> {{p.name}}</em><br> 
+        </div>
+        <div class="col-1 text-right" style="margin-left: 8px;margin-top: 11px;" (click)="removeTrackFromPlaylist(p.spotify)">
+            <ion-icon name="close-circle" style="font-size: 29px;margin-left: 18px;color: var(--danger);"></ion-icon>
+        </div>
+    </div>
+
+</div>
+
+
 <div id="listenToPlaylist" class="d-none">
     <div class="player">
         <div class="container">
             <div class="icons">
                 <span (click)="returnToPlaylists()"><ion-icon name="arrow-undo-outline"></ion-icon></span>
                 <h1>{{listeningPlaylist.name}}</h1>
-                <span (click)="likeTrack()"><ion-icon [name]="listeningPlaylist.liked ? 'heart' : 'heart-outline'"></ion-icon></span>
                 <span *ngIf="listeningPlaylist.admin == true" (click)="editPlaylist()"><ion-icon name="create"></ion-icon></span>
             </div>
 

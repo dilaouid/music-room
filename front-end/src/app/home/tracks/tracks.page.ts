@@ -18,7 +18,7 @@ export class TracksPage implements OnInit {
 
   public  tracksTrackTab;
   public  searchTrackValue;
-  public  playingTrack:any = {uuid: null, id: 0, liked: false, name: null, url: null, cover: null, group: null};
+  public  playingTrack:any = {uuid: null, id: 0, liked: false, name: null, url: null, cover: null, group: null, spotify: null};
   public  playIcon:boolean = false;
   public  audio;
   public  playlistsToAddTrack = [];
@@ -151,7 +151,6 @@ export class TracksPage implements OnInit {
           spotify: res.data.data.spotify,
           name: res.data.data.title,
           cover: res.data.data.cover,
-          spotify: res.data.data.spotify,
           group: res.data.data.group,
           url: res.data.data.url,
           liked: res.data.data.liked

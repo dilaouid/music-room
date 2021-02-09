@@ -56,15 +56,23 @@ router.get('/:id', authentified, async (req, res) => {
     const user = await getInfos(token);
     Playlist.findById( id ).then(async(playlist) => {
         if (playlist && ( (playlist.private == true && playlist.admins.includes(user.id)) || playlist.private == false) ) {
+            var adminsUsername = [];
+            for (let i = 0; i < playlist.admins.length; i++) {
+                await User.findById(playlist.admins[i]).then(us => {
+                    adminsUsername.push(us.username);
+                })
+            }
             res.json({statut: 200, data:{
                 title: playlist.name,
                 uuid: playlist._id,
                 admins: playlist.admins,
+                adminsUsername: adminsUsername,
                 tracks: playlist.tracks,
                 likes: playlist.likes.length,
                 events: playlist.inEvents,
                 liked: playlist.likes.includes(user.id),
-                admin: playlist.admins.includes(user.id)
+                admin: playlist.admins.includes(user.id),
+                private: playlist.private
             }});
         } else if(playlist.private == true && !playlist.admins.includes(user.id)) {
             res.json({statut: 403, res:'Access denied'})
@@ -144,7 +152,6 @@ router.get('/add/:id/:track', authentified, async (req, res) => {
         res.json({statut: 200, res:'OK'});
     }
 });
-
 router.post('/update', urlencodedParser, authentified, async (req, res) => {
     const   token         = req.cookies.token;
     var     infos         = await getInfos(token);
@@ -163,7 +170,7 @@ router.post('/update', urlencodedParser, authentified, async (req, res) => {
         var adminsID      = [userid];
         for (let i = 0; i < adminsParsed.length; i++) {
             await User.findOne({username : adminsParsed[i]}, (err, data) => {
-                if (data._id != userid) { adminsID.push(data._id.toString()); }
+                if (data && data._id != userid) { adminsID.push(data._id.toString()); }
             });
         }
         await Playlist.updateOne({"_id": playlistID}, { private: req.body.private, name: req.body.name, admins: adminsID });

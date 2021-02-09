@@ -1,7 +1,154 @@
 <ion-content [scrollEvents]="true">
-<div id="playlists">
-  <ion-grid>
-    Bomberman
-  </ion-grid>
+
+<div id="listenToPlaylist" class="d-none">
+    <div class="player">
+        <div class="container">
+            <div class="icons">
+                <span (click)="returnToPlaylists()"><ion-icon name="arrow-undo-outline"></ion-icon></span>
+                <h1>{{listeningPlaylist.name}}</h1>
+                <span (click)="likeTrack()"><ion-icon [name]="listeningPlaylist.liked ? 'heart' : 'heart-outline'"></ion-icon></span>
+                <span *ngIf="listeningPlaylist.admin == true" (click)="editPlaylist()"><ion-icon name="create"></ion-icon></span>
+            </div>
+
+            <div class="img">
+                <img src="{{currentlyPlayingTrack.cover}}">
+            </div>
+
+            <div class="title">
+                <h1>{{currentlyPlayingTrack.name}}</h1>
+                <p>{{currentlyPlayingTrack.group}}</p>
+            </div>
+
+            <div class="time">
+                00:00
+                <span></span>
+                00:30
+            </div>
+
+            <div class="seek">
+                <div class="fill"></div>
+            </div>
+
+        </div>
+        
+        <div class="audio-btns">
+
+            <div class="play-btns">
+                <span class="previous" (click)="previousSong()"><ion-icon name="play-skip-back"></ion-icon></span>
+                <span class="play-pause" (click)="togglePlay()"><ion-icon [name]="playIcon ? 'play' : 'pause'"></ion-icon></span>
+                <span class="next" (click)="nextSong()"><ion-icon name="play-skip-forward"></ion-icon></span>
+            </div>
+
+            <div class="repeat-btns">
+                <button class="decrease item" (click)="decreaseVolume()">-</button>
+                <span class="volume-up item"><ion-icon [name]="mutedSong ? 'volume-off' : 'volume-high'"></ion-icon></span>
+                <button class="increase item" (click)="increaseVolume()">+</button>
+            </div>
+
+        </div>
+    </div>
 </div>
+
+    <!-- ================= Modal for playlist creation =============== -->
+
+    <div class="modal fade" role="dialog" tabindex="-1" data-backdrop="false" id="createPlaylistModal">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header shadow-sm" style="background: var(--danger);">
+                    <h4 class="modal-title">Create a new playlist</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label class="text-black-50">Playlist name</label>
+                            <input class="shadow-sm form-control form-control-lg" type="text" name="name" maxlength="10" minlength="3" style="border-radius: 30px;" #playlistNameInput>
+                        </div>
+                        <div class="form-check" style="color: darkslategrey;">
+                            <input class="form-check-input" type="checkbox" id="formCheck-1" (change)="isPrivateCreatePlaylist = !isPrivateCreatePlaylist"/>
+                            <label class="form-check-label" for="formCheck-1">Private </label>
+                        </div>
+                    </form>
+                    <div id="alertBoxPlaylistCreation" class="alert d-none" role="alert">
+                        <span id="alertCaption"></span>
+                    </div>
+                </div>
+                <div class="modal-footer shadow-lg">
+                    <button class="btn btn-light" type="button" data-dismiss="modal">Close</button>
+                    <button class="btn btn-danger" type="button" (click)="createPlaylist(playlistNameInput.value)" id="createPlaylistBtn">Create</button></div>
+            </div>
+        </div>
+    </div>
+
+<!-- ================= Modal for playlist deletion =============== -->
+
+    <div class="modal fade" role="dialog" tabindex="-1" data-backdrop="false" id="deletePlaylistModal">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header shadow-sm" style="background: var(--danger);">
+                    <h4 class="modal-title">Delete a playlist</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body" style="color:black">
+                    <p>Are you sure you want to delete this playlist? <strong>This action cannot be undone!</strong></p>
+                </div>
+                <div class="modal-footer shadow-lg">
+                    <button class="btn btn-light" type="button" data-dismiss="modal">Close</button>
+                    <button class="btn btn-danger" type="button" (click)="deletePlaylist()">Yes, DESTROY !</button></div>
+            </div>
+        </div>
+    </div>
+
+<!-- ================= Tabs =============== -->
+
+<div id="tabsExplorer">
+    <ul class="nav nav-tabs nav-fill" role="tablist">
+        <li class="nav-item" role="presentation"><a class="nav-link active" role="tab" data-toggle="tab" href="#tab-1">All playlists</a></li>
+        <li class="nav-item" role="presentation"><a class="nav-link" role="tab" data-toggle="tab" href="#tab-2">Your playlists</a></li>
+    </ul>
+    <div class="tab-content" style="margin-top: 46px;">
+
+        <div class="tab-pane active" role="tabpanel" id="tab-1">
+        <!-- ================= Loop through all public tabs =============== -->
+
+            <div *ngFor="let p of allPlaylists" class="row no-gutters align-items-center rowPlaylistItem" data-bs-hover-animate="pulse" (click)="playPlaylist(p.uuid, p.tracks.length)">
+                <div class="col-9" style="margin-left: 8px;margin-top: 11px;">
+                    <p style="font-size: 13px;color: var(--gray);">
+                        &nbsp;<ion-icon name="reader-outline"></ion-icon>&nbsp; <strong>{{p.title}}</strong><br>
+                        &nbsp;<ion-icon name="musical-notes-outline"></ion-icon>&nbsp; {{p.tracks.length}} track<span *ngIf="p.tracks.length > 1">s</span><br>
+                        &nbsp;<ion-icon name="heart-outline"></ion-icon>&nbsp; {{p.likes}}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane" role="tabpanel" id="tab-2">
+            <div class="row no-gutters text-center" style="margin-top: 38px;margin-bottom: 46px;">
+                <div class="col">
+                    <button class="btn btn-danger shadow-lg" type="button" style="width: 295px;border-radius: 25px;" (click)="openFormCreateTab()">Create a new playlist</button></div>
+            </div>
+
+            <!-- ================= Loop through all public tabs =============== -->
+
+            <div *ngFor="let p of yourPlaylists" class="row no-gutters align-items-center rowPlaylistItem" data-bs-hover-animate="pulse">
+                <div class="col-8" style="margin-left: 8px;margin-top: 11px;" (click)="playPlaylist(p._id, p.tracks.length)">
+                    <p style="font-size: 13px;color: var(--gray);"> 
+                        &nbsp;<ion-icon name="reader-outline"></ion-icon>&nbsp; <strong>{{p.name}}</strong><br>
+                        &nbsp;<ion-icon name="musical-notes-outline"></ion-icon>&nbsp; {{p.tracks.length}} track<span *ngIf="p.tracks.length > 1">s</span><br>
+                        &nbsp;<ion-icon name="heart-outline"></ion-icon>&nbsp; {{p.likes.length}}</p>
+                </div>
+                <div *ngIf="p.private == true" class="col-auto offset-4 text-right" style="margin-left: 8px;margin-top: 11px;">
+                    <p style="font-size: 13px;color: var(--gray);">
+                        <ion-icon name="lock-closed" style="font-size: 46px;opacity: 0.20;"></ion-icon>
+                    </p>
+                </div>
+                <div class="col-auto offset-4 text-right" style="margin-left: 8px;margin-top: 11px;" (click)="openModalDeletePlaylist(p._id, p.title)">
+                    <p style="font-size: 13px;color: var(--gray);">
+                        <ion-icon name="close-circle" style="font-size: 29px;margin-left: 18px;color: var(--danger);"></ion-icon>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 </ion-content>

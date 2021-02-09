@@ -20,6 +20,7 @@ router.get('/', authentified, async (req, res) => {
                 if ((el.private == true && el.admins.includes(user.id)) || (el.private == false) ){
                     playlistAll.push({
                         uuid: el._id,
+                        title: el.name,
                         admins: el.admins,
                         tracks: el.tracks,
                         likes: el.likes.length,
@@ -56,11 +57,14 @@ router.get('/:id', authentified, async (req, res) => {
     Playlist.findById( id ).then(async(playlist) => {
         if (playlist && ( (playlist.private == true && playlist.admins.includes(user.id)) || playlist.private == false) ) {
             res.json({statut: 200, data:{
+                title: playlist.name,
                 uuid: playlist._id,
                 admins: playlist.admins,
                 tracks: playlist.tracks,
                 likes: playlist.likes.length,
-                events: playlist.inEvents
+                events: playlist.inEvents,
+                liked: playlist.likes.includes(user.id),
+                admin: playlist.admins.includes(user.id)
             }});
         } else if(playlist.private == true && !playlist.admins.includes(user.id)) {
             res.json({statut: 403, res:'Access denied'})
@@ -68,6 +72,7 @@ router.get('/:id', authentified, async (req, res) => {
             res.json({statut: 404, res:'Playlist not found'})
         }
     }).catch(err => {
+        console.log(err)
         return res.json({statut: 400, res:'Invalid id'});
     });
 });
@@ -99,7 +104,8 @@ router.post('/new', urlencodedParser, authentified, async (req, res) => {
         name:   sanitize(req.body.name),
         tracks: [],
         likes: [],
-        inEvents: []
+        inEvents: [],
+        private: req.body.private
     }).save();
     User.findByIdAndUpdate(userid.id, { $push: { playlists:  newPlaylist._id.toString() } }, (err, model) => {
         console.log(err);
@@ -124,7 +130,7 @@ router.get('/add/:id/:track', authentified, async (req, res) => {
     } else if (!playlist.admins.includes(userid)) {
         res.json({statut: 403, res:'Access denied'});
     } else {
-        var music = await Music.findById(musicID).then(data => {
+        var music = await Music.findOne({spotify: musicID}).then(data => {
             if (data) { return (data); }
         });
         if (music == null) { res.json({statut: 400, res:'Music not found'}); }

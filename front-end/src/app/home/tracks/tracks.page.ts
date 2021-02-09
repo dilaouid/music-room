@@ -47,12 +47,12 @@ export class TracksPage implements OnInit {
     }
   }
 
-  public async addToPlaylist(playlistID:string, uuid:string)
+  public async addToPlaylist(playlistID:string, spotifyID:string)
   {
-    await axios({url: `${environment.backEndUrl}/api/playlists/add/${playlistID}/${uuid}`, method: 'get', withCredentials: true})
+    await axios({url: `${environment.backEndUrl}/api/playlists/add/${playlistID}/${spotifyID}`, method: 'get', withCredentials: true})
       .then(res => {
         if (res.data.statut == 200) {
-           $(`#row_${uuid}`).remove();
+           $(`#row_${playlistID}`).remove();
         }
     })
   }
@@ -127,7 +127,7 @@ export class TracksPage implements OnInit {
       this.playlistsToAddTrack = res.data.data;
     });
     for (let i = 0; i < this.playlistsToAddTrack.length; i++) {
-      if (this.playlistsToAddTrack[i].tracks.includes(this.playingTrack.uuid)) {
+      if (this.playlistsToAddTrack[i].tracks.includes(this.playingTrack.spotify)) {
         this.playlistsToAddTrack.splice(i, 1);
       }
     }
@@ -148,8 +148,10 @@ export class TracksPage implements OnInit {
         this.playingTrack = {
           id: id,
           uuid: res.data.data.uuid,
+          spotify: res.data.data.spotify,
           name: res.data.data.title,
           cover: res.data.data.cover,
+          spotify: res.data.data.spotify,
           group: res.data.data.group,
           url: res.data.data.url,
           liked: res.data.data.liked

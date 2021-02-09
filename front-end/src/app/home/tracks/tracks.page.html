@@ -14,7 +14,7 @@
                             <tr *ngIf="playlistsToAddTrack.length == 0; else elseBlock">
                                 <td class="text-center" colspan="2"><em>No playlists yet</em></td>
                             </tr>
-                            <tr #elseBlock *ngFor="let p of playlistsToAddTrack" (click)="addToPlaylist(p._id, playingTrack.uuid)" id="row_{{playingTrack.uuid}}">
+                            <tr #elseBlock *ngFor="let p of playlistsToAddTrack" (click)="addToPlaylist(p._id, playingTrack.spotify)" id="row_{{p._id}}">
                                 <td><strong>{{p.name}}</strong></td>
                                 <td>{{p.tracks.length}} track<span *ngIf="p.tracks.length > 1">s</span></td>
                             </tr>

@@ -202,6 +202,8 @@ router.get('/validate/:hashtoken', async (req, res) => {
         console.log(err)
     }
 });
+
 router.use('/oauth/facebook', oauthfacebook);
+router.use('/oauth/google', oauthgoogle);
 
 module.exports = router;

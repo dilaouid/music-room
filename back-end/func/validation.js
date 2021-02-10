@@ -1,8 +1,7 @@
 const Validator         = require("validator");
 const isEmpty           = require("is-empty");
-const cookieParser      = require('cookie-parser');
 const registerError     = require('../misc/errors-msg').error_register_msg;
-const playlistsError     = require('../misc/errors-msg').playlists;
+const playlistsError    = require('../misc/errors-msg').playlists;
 const eventsError       = require('../misc/errors-msg').events;
 var passwordValidator   = require('password-validator');
 
@@ -35,7 +34,7 @@ const register = (data) => {
         data.birthday           = !isEmpty(data.birthday) ? data.birthday : "";
     
         if (Validator.isEmpty(data.username)) errors.username = registerError.username;
-        if (!schema.validate(data.password)) errors.password = registerError.firstname;
+        if (!schema.validate(data.password)) errors.password = registerError.password_invalid;
         if (Validator.isEmpty(data.confirm_password)) errors.confirm_password = registerError.confirm_password;
         if (!Validator.equals(data.password, data.confirm_password)) errors.confirm_password = registerError.confirm_password;
         if (Validator.isEmpty(data.birthday)) errors.birthday = registerError.birthday;
@@ -78,4 +77,14 @@ const playlists = (data) => {
     };
 }
 
-module.exports = { register, events, playlists };
+const updateUser = (data) => {
+        let errors = {};
+        data.password  = !isEmpty(data.password) ? data.password : "";
+        if (!schema.validate(data.password)) errors.password = registerError.password_invalid;
+        return {
+            errors,
+            isValid: !isEmpty(errors)
+        };
+};
+
+module.exports = { register, events, playlists, updateUser };

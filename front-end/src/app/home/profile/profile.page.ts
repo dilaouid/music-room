@@ -260,6 +260,37 @@ export class ProfilePage implements OnInit {
     return (true);
   }
 
+  public async updateUser(username:string, firstname:string, lastname:string, password:string, confirmpassword:string)
+  {
+    $('#alertBoxProfileEdit').removeClass('d-none');
+    username = username.replace(/\s/g,'');
+    if (username.length < 3) {
+      $('#alertBoxProfileEdit').addClass('alert-danger');
+      $('#alertEditProfileCaption').html('You must enter an username which contains at least 3 characters!')
+      return false;
+    } else if (username == this.user.username) {
+      username = '';
+    }
+    if (password && (password != confirmpassword || password.length < 8)) {
+      $('#alertBoxProfileEdit').addClass('alert-danger');
+      $('#alertEditProfileCaption').html('The passwords must be identical and contains at least 8 characters (uppercase, lowercase, number, symbols');
+      return false;
+    }
+    $('#updateBtn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+    await axios({url: `${environment.backEndUrl}/api/users/update`, method: 'post', data: {username: username, lastname: lastname, password: password, firstname: firstname}, withCredentials: true}).then(res=>{
+      if (res.data.statut == 200) {
+        $('#alertBoxProfileEdit').removeClass('alert-danger');
+        $('#alertBoxProfileEdit').addClass('alert-success');
+      } else {
+        $('#alertBoxProfileEdit').removeClass('alert-success');
+        $('#alertBoxProfileEdit').addClass('alert-danger');
+      }
+      $('#alertEditProfileCaption').html(res.data.msg);
+    });
+    $('#updateBtn').html('Edit profile');
+    await this.getUserInfos();
+  }
+
   async ngOnInit() {
     await this.getUserInfos();
     this.likedTracks = new Array(this.user.likes.length);

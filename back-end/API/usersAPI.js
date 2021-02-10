@@ -1,6 +1,8 @@
 const express       = require('express');
 const router        = express.Router();
 const jwt           = require('jsonwebtoken')
+const bcrypt        = require("bcryptjs");
+const sanitize      = require('mongo-sanitize');
 const User          = require("../models/Users");
 const authentified  = require("../middleware/auth");
 const validation    = require("../func/validation");
@@ -109,6 +111,43 @@ router.get('/:id', authentified, (req, res) => {
         }
     }).catch(err =>  {
         return res.json({statut: 400, res:'Invalid id'});
+    });
+});
+
+
+router.post('/update', authentified, async (req, res) => {
+    const   token           = req.cookies.token;
+    var     infos           = await getInfos(token);
+    var     userid          = infos.id;
+    var     updatePassword  = req.body.password.length > 0;
+    var     updateFirstname = req.body.firstname.length > 0;
+    var     updateLastname  = req.body.lastname.length > 0;
+    var     updateUsername  = req.body.username.length > 0;
+    if (updatePassword) {
+        let {error, valid} = validation.updateUser(req.body);
+        if (!{valid}) { return res.json({statut: 204, msg: error}); }
+    }
+    await User.findById(userid).then(async data => {
+        if (updatePassword) {
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(data.password, salt, (err, hash) => {
+                    if (err) throw err;
+                    data.password = hash;
+                });
+            });
+        }
+        if (updateUsername) {
+            var existUser = await User.findOne({username: req.body.username}).then(us => {
+                if (us) { return true; }
+                else { return false; }
+            })
+            if (!existUser) { data.username  = req.body.username; }
+            else { return res.json({statut: 204, msg: 'This username is already taken by someone else!'})  }
+        }
+        updateFirstname ? data.firstname = req.body.firstname : data.firstname = data.firstname;
+        updateLastname  ? data.lastname  = req.body.lastname  : data.lastname  = data.lastname;
+        data.save();
+        return res.json({statut: 200, msg:'Profile updated!'})
     });
 });
 

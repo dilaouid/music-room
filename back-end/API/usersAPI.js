@@ -3,6 +3,7 @@ const router        = express.Router();
 const jwt           = require('jsonwebtoken')
 const User          = require("../models/Users");
 const authentified  = require("../middleware/auth");
+const validation    = require("../func/validation");
 const getInfos      = require("../func/getInfos");
 
 router.get('/', authentified, (req, res) => {
@@ -51,9 +52,12 @@ router.get('/me', authentified, async (req, res) => {
             username: user.username,
             picture: user.img,
             description: user.description,
+            lastname: user.lastname,
+            firstname: user.firstname,
             playlist: user.playlists,
             following: user.following,
             followers: user.followers,
+            likes: user.givenLikes,
             events: user.events
         }});
     });

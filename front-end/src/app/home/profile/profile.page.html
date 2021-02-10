@@ -1,7 +1,231 @@
 <ion-content [scrollEvents]="true">
-<div id="profile">
-  <ion-grid>
-    T'inquiète pas
-  </ion-grid>
+
+  <!-- ========================== Modal add track to Playlist ========================== -->
+  <div class="modal fade" role="dialog" data-backdrop="false" tabindex="-1" id="addToPlaylist" appendTo="body">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--danger);">
+                <h4 class="modal-title">Add to a playlist</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive table-borderless" style="width: 100%;">
+                    <table class="table table-striped table-bordered table-hover">
+                        <tbody>
+
+                            <tr *ngIf="playlistsToAddTrack.length == 0; else elseBlock">
+                                <td class="text-center" colspan="2"><em>No playlists yet</em></td>
+                            </tr>
+                            <tr #elseBlock *ngFor="let p of playlistsToAddTrack" (click)="addToPlaylist(p._id, playingTrack.spotify)" id="row_{{p._id}}">
+                                <td><strong>{{p.name}}</strong></td>
+                                <td>{{p.tracks.length}} track<span *ngIf="p.tracks.length > 1">s</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="background: var(--danger);">
+                <button class="btn btn-light" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- ========================== Modal edit Profile ========================== -->
+  <div class="modal fade" role="dialog" data-backdrop="false" tabindex="-1" id="editProfile" appendTo="body">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--danger);">
+                <h4 class="modal-title">Edit profile</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+            <form>
+              <div class="form-group">
+                  <label class="text-black-50">Username</label>
+                  <input [value]="user.username" class="shadow-sm form-control form-control-lg" type="text" name="name" required maxlength="10" minlength="3" style="border-radius: 30px;" #playlistNameEdit>
+              </div>
+              <div class="form-group">
+                  <label class="text-black-50">Firstname</label>
+                  <input [value]="user.firstname" class="shadow-sm form-control form-control-lg" type="text" name="name" required maxlength="10" minlength="3" style="border-radius: 30px;" #playlistNameEdit>
+              </div>
+              <div class="form-group">
+                  <label class="text-black-50">Lastname</label>
+                  <input [value]="user.lastname" class="shadow-sm form-control form-control-lg" type="text" name="name" required maxlength="10" minlength="3" style="border-radius: 30px;" #playlistNameEdit>
+              </div>
+              <div class="form-group">
+                  <label class="text-black-50">Password</label>
+                  <input class="shadow-sm form-control form-control-lg" type="text" name="name" required maxlength="10" minlength="3" style="border-radius: 30px;" #playlistNameEdit>
+              </div>
+              <div class="form-group">
+                  <label class="text-black-50">Confirm password</label>
+                  <input class="shadow-sm form-control form-control-lg" type="text" name="name" required maxlength="10" minlength="3" style="border-radius: 30px;" #playlistNameEdit>
+              </div>
+              <div id="alertBoxProfileEdit" class="alert d-none" role="alert">
+                  <span id="alertEditProfileCaption"></span>
+              </div>
+            </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" type="button" data-dismiss="modal">Close</button>
+                <button class="btn btn-danger" type="button" (click)="updateUser()">Edit profile</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- ========================== Audio Player for Track ========================== -->
+  <div id="listenToTrackFromProfile" class="d-none">
+    <div class="player">
+        <div class="container">
+            <div class="icons">
+                <span (click)="returnToProfile()"><ion-icon name="arrow-undo-outline"></ion-icon></span>
+                <h1>10H PlayeR</h1>
+                <span (click)="likeTrack()"><ion-icon [name]="playingTrack.liked ? 'heart' : 'heart-outline'"></ion-icon></span>
+                <span (click)="openModalAddPlaylist()"><ion-icon name="add-circle-outline"></ion-icon></span>
+            </div>
+            <div class="img">
+                <img src="{{playingTrack.cover}}">
+            </div>
+            <div class="title">
+                <h1>{{playingTrack.name}}</h1>
+                <p>{{playingTrack.group}}</p>
+            </div>
+            <div class="time">
+                00:00
+                <span></span>
+                00:30
+            </div>
+            <div class="seek">
+                <div class="fill"></div>
+            </div>
+        </div>
+        <div class="audio-btns">
+            <div class="play-btns">
+                <button class="decrease item" (click)="decreaseVolume()">-</button>
+                <span class="play-pause" (click)="togglePlay()"><ion-icon [name]="playIcon ? 'play' : 'pause'"></ion-icon></span>
+                <button class="increase item" (click)="increaseVolume()">+</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- ========================== Audio Player for Playlist ========================== -->
+  <div id="listenToPlaylistFromProfile" class="d-none">
+    <div class="player">
+        <div class="container">
+            <div class="icons">
+                <span (click)="returnToProfile()"><ion-icon name="arrow-undo-outline"></ion-icon></span>
+                <h1>{{listeningPlaylist.name}}</h1>
+            </div>
+
+            <div class="img">
+                <img src="{{playingTrack.cover}}">
+            </div>
+
+            <div class="title">
+                <h1>{{playingTrack.name}}</h1>
+                <p>{{playingTrack.group}}</p>
+            </div>
+
+            <div class="time">
+                00:00
+                <span></span>
+                00:30
+            </div>
+
+            <div class="seek">
+                <div class="fill"></div>
+            </div>
+
+        </div>
+        
+        <div class="audio-btns">
+
+            <div class="play-btns">
+                <span class="previous" (click)="previousSong()"><ion-icon name="play-skip-back"></ion-icon></span>
+                <span class="play-pause" (click)="togglePlay()"><ion-icon [name]="playIcon ? 'play' : 'pause'"></ion-icon></span>
+                <span class="next" (click)="nextSong()"><ion-icon name="play-skip-forward"></ion-icon></span>
+            </div>
+
+            <div class="repeat-btns">
+                <button class="decrease item" (click)="decreaseVolume()">-</button>
+                <span class="volume-up item"><ion-icon [name]="mutedSong ? 'volume-off' : 'volume-high'"></ion-icon></span>
+                <button class="increase item" (click)="increaseVolume()">+</button>
+            </div>
+
+        </div>
+    </div>
+  </div>
+
+  <!-- ========================== Profile page ========================== -->
+  <div id="profileTab">
+    
+    <div class="row no-gutters text-center" style="margin-top: 25px;">
+      <div class="col">
+        <img class="rounded-circle" src="{{user.picture}}" style="width: 129px;">
+      </div>
+    </div>
+
+  <div class="row no-gutters text-center" style="margin-top: 25px;">
+      <div class="col">
+          <p>{{user.username}}<br>
+            {{user.firstname}} {{user.lastname}}</p>
+      </div>
+  </div>
+
+  <div class="row no-gutters" style="text-align: center;margin-bottom: 27px;">
+      <div class="col" style="text-align: right;margin-right: 23px;">
+          <button class="btn btn-info" type="button" style="border-radius: 32px;" (click)="editProfile()">Edit profile</button>
+      </div>
+      <div class="col" style="text-align: left;">
+          <button class="btn btn-danger" type="button" style="border-radius: 20px;" (click)="logout()">Logout</button>
+      </div>
+  </div>
+  <ul class="nav nav-tabs nav-justified" role="tablist">
+      <li class="nav-item" role="presentation"><a class="nav-link active" role="tab" data-toggle="tab" href="#tab-1">Created playlists</a></li>
+      <li class="nav-item" role="presentation"><a class="nav-link" role="tab" data-toggle="tab" href="#tab-2">Liked tracks</a></li>
+  </ul>
+
+  <div class="tab-content">
+
+      <div class="tab-pane fade show active" role="tabpanel" id="tab-1">
+            <!-- ========================== Loop through all your Playlists ========================== -->
+            <div *ngFor="let p of yourPlaylists" class="row no-gutters align-items-center rowPlaylistItem" data-bs-hover-animate="pulse">
+              <div class="col-8" style="margin-left: 8px;margin-top: 11px;" (click)="playPlaylist(p._id, p.tracks.length)">
+                  <p style="font-size: 13px;color: var(--gray);"> 
+                      &nbsp;<ion-icon name="reader-outline"></ion-icon>&nbsp; <strong>{{p.name}}</strong><br>
+                      &nbsp;<ion-icon name="musical-notes-outline"></ion-icon>&nbsp; {{p.tracks.length}} track<span *ngIf="p.tracks.length > 1">s</span><br>
+                      &nbsp;<ion-icon name="heart-outline"></ion-icon>&nbsp; {{p.likes.length}}</p>
+              </div>
+              <div *ngIf="p.private == true" class="col-auto offset-4 text-right" style="margin-left: 8px;margin-top: 11px;">
+                  <p style="font-size: 13px;color: var(--gray);">
+                      <ion-icon name="lock-closed" style="font-size: 46px;opacity: 0.20;"></ion-icon>
+                  </p>
+              </div>
+              <!-- === END OF LOOP -->
+          </div>
+      </div>
+      <div class="tab-pane fade" role="tabpanel" id="tab-2">
+        
+            <!-- ========================== Loop through all your liked Tracks ========================== -->
+      <div class="row no-gutters align-items-center rowMusicItem" data-bs-hover-animate="pulse" *ngFor="let p of likedTracks; let i = index" (click)="playMusic(i)">
+          <div class="col-3">
+              <img src="{{p.cover}}" style="width: 83px;">
+          </div>
+          <div class="col-6" style="margin-top: 11px;">
+              <p style="font-size: 13px;color: var(--gray);"> <i class="fas fa-users"></i>
+              <strong> {{p.group}}</strong><br> 
+              <i class="fas fa-music"></i> 
+              <em> {{p.title}}</em><br> 
+              <i class="far fa-clock"></i> {{p.duration}}</p>
+          </div>
+          <div class="col-2 text-right" style="margin-top: 11px;">
+              <p style="font-size: 13px;color: var(--gray);"><i class="far fa-list-alt"></i> {{p.playlists.length}}</p>
+          </div>
+          
+            <!-- === END OF LOOP -->
+      </div>
+  </div>
 </div>
+  </div>
+
 </ion-content>

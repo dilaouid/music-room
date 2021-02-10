@@ -91,19 +91,19 @@
     </div>
     </div>
     <div class="row no-gutters align-items-center rowMusicItem" data-bs-hover-animate="pulse" *ngFor="let p of tracksTrackTab" id="{{p.uuid}}" (click)="playMusic(p.spotify)">
-    <div class="col-3">
-        <img src="{{p.cover}}" style="width: 83px;">
-    </div>
-    <div class="col-6" style="margin-top: 11px;">
-        <p style="font-size: 13px;color: var(--gray);"> <i class="fas fa-users"></i>
-        <strong> {{p.group}}</strong><br> 
-        <i class="fas fa-music"></i> 
-        <em> {{p.title}}</em><br> 
-        <i class="far fa-clock"></i> {{p.duration}}</p>
-    </div>
-    <div class="col-2 text-right" style="margin-top: 11px;">
-        <p style="font-size: 13px;color: var(--gray);"><i class="far fa-list-alt"></i> {{p.playlists.length}}</p>
-    </div>
+        <div class="col-3">
+            <img src="{{p.cover}}" style="width: 83px;">
+        </div>
+        <div class="col-6" style="margin-top: 11px;">
+            <p style="font-size: 13px;color: var(--gray);"> <i class="fas fa-users"></i>
+            <strong> {{p.group}}</strong><br> 
+            <i class="fas fa-music"></i> 
+            <em> {{p.title}}</em><br> 
+            <i class="far fa-clock"></i> {{p.duration}}</p>
+        </div>
+        <div class="col-2 text-right" style="margin-top: 11px;">
+            <p style="font-size: 13px;color: var(--gray);"><i class="far fa-list-alt"></i> {{p.playlists.length}}</p>
+        </div>
     </div>
 </div>
 

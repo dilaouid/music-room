@@ -172,7 +172,7 @@
     <div class="tab-content" style="margin-top: 46px;">
 
         <div class="tab-pane active" role="tabpanel" id="tab-1">
-        <!-- ================= Loop through all public tabs =============== -->
+        <!-- ================= Loop through all public playlists =============== -->
 
             <div *ngFor="let p of allPlaylists" class="row no-gutters align-items-center rowPlaylistItem" data-bs-hover-animate="pulse" (click)="playPlaylist(p.uuid, p.tracks.length)">
                 <div class="col-9" style="margin-left: 8px;margin-top: 11px;">
@@ -190,7 +190,7 @@
                     <button class="btn btn-danger shadow-lg" type="button" style="width: 295px;border-radius: 25px;" (click)="openFormCreateTab()">Create a new playlist</button></div>
             </div>
 
-            <!-- ================= Loop through all public tabs =============== -->
+            <!-- ================= Loop through all your playlists =============== -->
 
             <div *ngFor="let p of yourPlaylists" class="row no-gutters align-items-center rowPlaylistItem" data-bs-hover-animate="pulse">
                 <div class="col-8" style="margin-left: 8px;margin-top: 11px;" (click)="playPlaylist(p._id, p.tracks.length)">

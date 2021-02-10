@@ -18,7 +18,7 @@ export class TracksPage implements OnInit {
 
   public  tracksTrackTab;
   public  searchTrackValue;
-  public  playingTrack:any = {uuid: null, id: 0, liked: false, name: null, url: null, cover: null, group: null, spotify: null};
+  public  playingTrack:any = {uuid: null, id: 0, liked: false, name: null, url: null, cover: null, group: null};
   public  playIcon:boolean = false;
   public  audio;
   public  playlistsToAddTrack = [];

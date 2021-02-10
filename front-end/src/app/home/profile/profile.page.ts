@@ -224,6 +224,21 @@ export class ProfilePage implements OnInit {
     });
   }
 
+  public async openModalAddPlaylist()
+  {
+    await axios({url: `${environment.backEndUrl}/api/playlists/me`, method: 'get', withCredentials: true})
+    .then(res => {
+      this.playlistsToAddTrack = res.data.data;
+    });
+    for (let i = 0; i < this.playlistsToAddTrack.length; i++) {
+      if (this.playlistsToAddTrack[i].tracks.includes(this.playingTrack.spotify)) {
+        this.playlistsToAddTrack.splice(i, 1);
+      }
+    }
+    $('#addToPlaylist').show()
+    $('#addToPlaylist').modal("show");
+  }
+
   private async getLikedTracks()
   {
     for (let i = 0; i < this.user.likes.length; i++) {

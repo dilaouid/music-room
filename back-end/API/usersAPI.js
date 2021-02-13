@@ -26,7 +26,7 @@ router.get('/', authentified, (req, res) => {
             });
             res.json({statut: 200, data: usersList});
         } else {
-            res.json({statut: 400, res:'No users'})
+            res.json({statut: 404, res:'No users'})
         }
     });
 });
@@ -53,7 +53,6 @@ router.get('/me', authentified, async (req, res) => {
             uuid: user._id,
             username: user.username,
             picture: user.img,
-            description: user.description,
             lastname: user.lastname,
             firstname: user.firstname,
             playlist: user.playlists,

@@ -139,7 +139,10 @@ router.get('/add/:id/:track', authentified, async (req, res) => {
         res.json({statut: 403, res:'Access denied'});
     } else {
         var music = await Music.findOne({spotify: musicID}).then(data => {
-            if (data) { return (data); }
+            if (data) {
+                data.inPlaylists.includes(playlistID) ? data.inPlaylists.pull(playlistID) : data.inPlaylists.push(playlistID);
+                return (data);
+            }
         });
         if (music == null) { res.json({statut: 400, res:'Music not found'}); }
         if (playlist.tracks.includes(musicID)) {

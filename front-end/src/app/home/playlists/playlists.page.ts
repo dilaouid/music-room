@@ -101,6 +101,7 @@ export class PlaylistsPage implements OnInit {
     this.currentSong == 0 ? this.currentSong = this.tracksToPlayPlaylistPage.length - 1 : this.currentSong--;
     this.currentlyPlayingTrack = this.tracksToPlayPlaylistPage[this.currentSong];
     this.audio = new Audio();
+    this.audio.volume = 0.5;
     this.playSong();
     this.audio.addEventListener("timeupdate", () => {
       let position = this.audio.currentTime / this.audio.duration;

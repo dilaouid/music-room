@@ -141,6 +141,7 @@ router.get('/add/:id/:track', authentified, async (req, res) => {
         var music = await Music.findOne({spotify: musicID}).then(data => {
             if (data) {
                 data.inPlaylists.includes(playlistID) ? data.inPlaylists.pull(playlistID) : data.inPlaylists.push(playlistID);
+                data.save();
                 return (data);
             }
         });

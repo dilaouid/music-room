@@ -159,6 +159,7 @@ export class TracksPage implements OnInit {
     $('#listenToTrack').removeClass('d-none');
     $('#tracks').addClass('d-none');
     this.audio = new Audio();
+    this.audio.volume = 0.7;
     this.playSong();
     this.audio.addEventListener("timeupdate", () => {
       let position = this.audio.currentTime / this.audio.duration;

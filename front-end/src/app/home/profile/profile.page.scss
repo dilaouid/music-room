@@ -40,9 +40,9 @@ img {
 .player {
     /* background: #000; */
     width: 450px;
-    height: 105vh;
+    height: 120vh;
     position: absolute;
-    top:53%;
+    top:60%;
     left: 50%;
     transform: translate(-50%, -50%);
     color: #ff012f;
@@ -157,7 +157,29 @@ img {
     border-radius: 50%;
     box-shadow: 1px 1px 50px #111;
 }
-  
+
+.vol {
+    color: #fff;
+    margin: 0 20px;
+    font-size: 1.3em;
+    width: 30px;
+    height: 30px;
+    border: none;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #ff012f;
+    border-radius: 50%;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 1px 1px 25px #111;
+    transition: all 0.3s;
+}
+
+.vol:hover {
+    background: #ff0634;
+    color:#fff;
+}
+
 .repeat-btns {
     margin: 30px 0;
     margin-bottom: -50px

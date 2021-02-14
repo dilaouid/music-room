@@ -24,6 +24,8 @@ export class ProfilePage implements OnInit {
 
   public  playlistsToAddTrack = [];
 
+  public  previousLikesNB:number = 0;
+
   public  listeningPlaylist = {id: '', name: '', admin:false, admins: [], liked: false, private:false}
 
   public  user = {username: '', lastname: '', img: '', firstname: '', likes: []}
@@ -217,7 +219,7 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  private async getUserInfos()
+  public async getUserInfos()
   {
     await axios({url: `${environment.backEndUrl}/api/users/me`, method: 'get', withCredentials: true}).then(res=>{
       this.user = res.data.data;
@@ -291,11 +293,22 @@ export class ProfilePage implements OnInit {
     await this.getUserInfos();
   }
 
-  async ngOnInit() {
+  public async getAllInfos()
+  {
     await this.getUserInfos();
-    this.likedTracks = new Array(this.user.likes.length);
+    if (this.previousLikesNB != this.user.likes.length) {
+      this.previousLikesNB = this.user.likes.length;
+      this.likedTracks = new Array(this.user.likes.length);
+      await this.getLikedTracks();
+    }
     await this.getYourPlaylists();
-    await this.getLikedTracks();
+  }
+
+  async ngOnInit() {
+    var that = this;
+    setInterval(async function () {
+      await that.getAllInfos();
+    }, 2000);
   }
 
 }

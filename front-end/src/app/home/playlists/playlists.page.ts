@@ -92,6 +92,7 @@ export class PlaylistsPage implements OnInit {
   {
     $('#listenToPlaylist').addClass('d-none');
     $('#tabsExplorer').removeClass('d-none');
+    this.playIcon = false;
     this.audio.pause();
   }
 

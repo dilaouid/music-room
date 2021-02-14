@@ -197,6 +197,7 @@ export class ProfilePage implements OnInit {
     $('#listenToPlaylistFromProfile').addClass('d-none');
     $('#profileTab').removeClass('d-none');
     this.audio.pause();
+    this.playIcon = false;
   }
 
   public editProfile()

@@ -117,6 +117,7 @@ export class TracksPage implements OnInit {
     $('#listenToTrack').addClass('d-none');
     $('#tracks').removeClass('d-none');
     this.audio.pause();
+    this.playIcon = false;
   }
 
 

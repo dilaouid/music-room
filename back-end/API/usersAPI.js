@@ -8,6 +8,10 @@ const authentified  = require("../middleware/auth");
 const validation    = require("../func/validation");
 const getInfos      = require("../func/getInfos");
 
+function removeDuplicates(array) {
+    array.splice(0, array.length, ...(new Set(array)))
+};
+
 router.get('/', authentified, (req, res) => {
     User.find( {}, {givenLikes: 0, admin: 0, oauthID: 0, password: 0, birthday: 0, hashtoken: 0, date: 0} ).then(async(user) => {
         var usersList = [];
@@ -122,6 +126,7 @@ router.post('/update', authentified, async (req, res) => {
     var     updateFirstname = req.body.firstname.length > 0;
     var     updateLastname  = req.body.lastname.length > 0;
     var     updateUsername  = req.body.username.length > 0;
+    var     updatePreferen  = req.body.preferences.length > 0;
     if (updatePassword) {
         let {error, valid} = validation.updateUser(req.body);
         if (!{valid}) { return res.json({statut: 204, msg: error}); }
@@ -142,6 +147,11 @@ router.post('/update', authentified, async (req, res) => {
             })
             if (!existUser) { data.username  = req.body.username; }
             else { return res.json({statut: 204, msg: 'This username is already taken by someone else!'})  }
+        }
+        if (updatePreferen) {
+            var preferences = req.body.preferences.replace(/ /g,' ').split(' ');
+            var filteredPref = removeDuplicates(preferences);
+            if (filteredPref != data.musical_preferences) { data.musical_preferences = filteredPref; }
         }
         updateFirstname ? data.firstname = req.body.firstname : data.firstname = data.firstname;
         updateLastname  ? data.lastname  = req.body.lastname  : data.lastname  = data.lastname;

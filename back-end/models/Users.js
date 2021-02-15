@@ -69,6 +69,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     }, // to recover password
+    musical_preferences:{
+        type: Array,
+        default: []
+    },
     facebook: JSON,
     google: JSON
 });

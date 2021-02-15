@@ -92,6 +92,7 @@ export class PlaylistsPage implements OnInit {
   {
     $('#listenToPlaylist').addClass('d-none');
     $('#tabsExplorer').removeClass('d-none');
+    $('#tabsBtn').removeClass('d-none');
     this.playIcon = false;
     this.audio.pause();
   }
@@ -155,6 +156,7 @@ export class PlaylistsPage implements OnInit {
     }
     this.currentlyPlayingTrack = this.tracksToPlayPlaylistPage[0];
     $('#listenToPlaylist').removeClass('d-none');
+    $('#tabsBtn').addClass('d-none');
     this.audio = new Audio();
     this.playSong();
     this.audio.addEventListener("timeupdate", () => {

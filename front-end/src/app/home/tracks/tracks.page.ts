@@ -116,6 +116,7 @@ export class TracksPage implements OnInit {
   {
     $('#listenToTrack').addClass('d-none');
     $('#tracks').removeClass('d-none');
+    $('#tabsBtn').removeClass('d-none');
     this.audio.pause();
     this.playIcon = false;
   }
@@ -158,6 +159,7 @@ export class TracksPage implements OnInit {
         };
     });
     $('#listenToTrack').removeClass('d-none');
+    $('#tabsBtn').addClass('d-none');
     $('#tracks').addClass('d-none');
     this.audio = new Audio();
     this.audio.volume = 0.5;

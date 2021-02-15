@@ -30,20 +30,20 @@ img {
   width: 450px;
   height: 105vh;
   position: absolute;
-  top:55%;
+  top:48%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: #ff012f;
   border-radius: 5px;
   box-shadow: 1px 1px 30px #111, -1px -1px 30px #111;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .container {
   width: 100%;
   max-width: 90%;
   margin: 0 auto;
-  /* overflow: hidden; */
+  overflow: hidden;
 }
 
 .icons {

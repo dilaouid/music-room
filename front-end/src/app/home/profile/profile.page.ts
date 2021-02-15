@@ -182,6 +182,7 @@ export class ProfilePage implements OnInit {
     this.playingTrack = this.likedTracks[index];
     $('#listenToTrackFromProfile').removeClass('d-none');
     $('#profileTab').addClass('d-none');
+    $('#tabsBtn').addClass('d-none');
     this.audio = new Audio();
     this.playSong();
     this.audio.addEventListener("timeupdate", () => {
@@ -196,6 +197,7 @@ export class ProfilePage implements OnInit {
     $('#listenToTrackFromProfile').addClass('d-none');
     $('#listenToPlaylistFromProfile').addClass('d-none');
     $('#profileTab').removeClass('d-none');
+    $('#tabsBtn').removeClass('d-none');
     this.audio.pause();
     this.playIcon = false;
   }

@@ -163,6 +163,7 @@ export class ProfilePage implements OnInit {
   {
     if (tracksLen == 0) { console.log('No tracks'); return ; }
     $('#profileTab').addClass('d-none');
+    $('#tabsBtn').addClass('d-none');
     this.currentSong = 0;
     var listOfTracksIDs;
     this.tracksToPlayPlaylistPage = await axios({url: `${environment.backEndUrl}/api/playlists/${id}`, method: 'get', withCredentials: true})

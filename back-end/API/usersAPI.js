@@ -9,7 +9,7 @@ const validation    = require("../func/validation");
 const getInfos      = require("../func/getInfos");
 
 function removeDuplicates(array) {
-    array.splice(0, array.length, ...(new Set(array)))
+    return array.splice(0, array.length, ...(new Set(array)))
 };
 
 router.get('/', authentified, (req, res) => {
@@ -25,7 +25,8 @@ router.get('/', authentified, (req, res) => {
                     playlist: el.playlists,
                     following: el.following,
                     followers: el.followers,
-                    events: el.events
+                    events: el.events,
+                    musical_preferences: el.musical_preferences
                 });
             });
             res.json({statut: 200, data: usersList});
@@ -63,7 +64,8 @@ router.get('/me', authentified, async (req, res) => {
             following: user.following,
             followers: user.followers,
             likes: user.givenLikes,
-            events: user.events
+            events: user.events,
+            musical_preferences: user.musical_preferences
         }});
     });
 });
@@ -107,7 +109,8 @@ router.get('/:id', authentified, (req, res) => {
                 playlist: user.playlists,
                 following: user.following,
                 followers: user.followers,
-                events: user.events
+                events: user.events,
+                musical_preferences: user.musical_preferences
             }});
         } else {
             res.json({statut: 400, res:'User not found'})
@@ -156,6 +159,7 @@ router.post('/update', authentified, async (req, res) => {
         updateFirstname ? data.firstname = req.body.firstname : data.firstname = data.firstname;
         updateLastname  ? data.lastname  = req.body.lastname  : data.lastname  = data.lastname;
         data.save();
+        console.log(`${data.username} updated his profile!`);
         return res.json({statut: 200, msg:'Profile updated!'})
     });
 });

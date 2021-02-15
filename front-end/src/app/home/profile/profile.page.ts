@@ -19,6 +19,23 @@ export class ProfilePage implements OnInit {
   public  playIcon:boolean = false;
   public  playingTrack:any = {uuid: null, id: 0, liked: false, name: null, url: null, cover: null, group: null, spotify: null};
 
+  public  availablePreferences:Array<string> = [
+    "Pop",
+    "Rock",
+    "Metal",
+    "Electro",
+    "Jazz",
+    "Rap",
+    "Classic",
+    "Funk",
+    "Retro",
+    "Country",
+    "Soul",
+    "Reggae",
+    "Disco"
+  ];
+  public  choosedPreference:any = [];
+
   public  tracksToPlayPlaylistPage:Array<any>;
   public  likedTracks:Array<any>;
 
@@ -28,11 +45,13 @@ export class ProfilePage implements OnInit {
 
   public  listeningPlaylist = {id: '', name: '', admin:false, admins: [], liked: false, private:false}
 
-  public  user = {username: '', lastname: '', img: '', firstname: '', likes: []}
+  public  user = {username: '', lastname: '', img: '', firstname: '', likes: [], musical_preferences: []}
   private currentSong:number = 0;
   public  audio;
 
   constructor(private router: Router, private route: ActivatedRoute) {
+    this.getUserInfos();
+    this.choosedPreference = this.user.musical_preferences;
    }
 
   private objectToArray = (obj => {
@@ -282,7 +301,7 @@ export class ProfilePage implements OnInit {
       return false;
     }
     $('#updateBtn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
-    await axios({url: `${environment.backEndUrl}/api/users/update`, method: 'post', data: {username: username, lastname: lastname, password: password, firstname: firstname}, withCredentials: true}).then(res=>{
+    await axios({url: `${environment.backEndUrl}/api/users/update`, method: 'post', data: {username: username, lastname: lastname, password: password, firstname: firstname, preferences: this.choosedPreference.join(' ')}, withCredentials: true}).then(res=>{
       if (res.data.statut == 200) {
         $('#alertBoxProfileEdit').removeClass('alert-danger');
         $('#alertBoxProfileEdit').addClass('alert-success');
@@ -294,17 +313,41 @@ export class ProfilePage implements OnInit {
     });
     $('#updateBtn').html('Edit profile');
     await this.getUserInfos();
+    this.choosedPreference = this.user.musical_preferences;
   }
 
   public async getAllInfos()
   {
-    await this.getUserInfos();
     if (this.previousLikesNB != this.user.likes.length) {
       this.previousLikesNB = this.user.likes.length;
       this.likedTracks = new Array(this.user.likes.length);
       await this.getLikedTracks();
     }
     await this.getYourPlaylists();
+  }
+
+  private removeItemOnce(arr, value)
+  {
+    var index = arr.indexOf(value);
+    if (index > -1) {
+      arr.splice(index, 1);
+    }
+    return arr;
+  }
+
+  public takePreference(genre)
+  {
+    if (!this.availablePreferences.includes(genre)) { return ; }
+    var dom = $(`#${genre}`);
+    if (dom.hasClass('badge-secondary')) {
+      dom.removeClass('badge-secondary');
+      dom.addClass('badge-info');
+      this.choosedPreference.push(genre);
+    } else {
+      dom.addClass('badge-secondary');
+      dom.removeClass('badge-info');
+      this.choosedPreference = this.removeItemOnce(this.choosedPreference, genre);
+    }
   }
 
   async ngOnInit() {

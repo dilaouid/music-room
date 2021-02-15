@@ -59,6 +59,14 @@
                   <label class="text-black-50">Confirm password</label>
                   <input #confirmpassword class="shadow-sm form-control form-control-lg" type="text" name="name" required minlength="3" style="border-radius: 30px;" #playlistNameEdit>
               </div>
+              <div class="form-group">
+                <div class="form-row">
+                    <div class="col">
+                        <label class="col-form-label text-black-50">Musical preferences<br></label>
+                    </div>
+                </div>
+                    <span *ngFor="let p of availablePreferences" id="{{p}}" (click)="takePreference(p)" [ngClass]="{'badge badge-pill':true, 'badge-secondary': !user.musical_preferences.includes(p), 'badge-info':user.musical_preferences.includes(p)}" style="font-size: 16px;margin-right: 16px;margin-bottom: 5px;">{{p}}</span>
+                </div>
               <div id="alertBoxProfileEdit" class="alert d-none" role="alert">
                   <span id="alertEditProfileCaption"></span>
               </div>
@@ -170,6 +178,13 @@
             {{user.firstname}} {{user.lastname}}</p>
       </div>
   </div>
+
+    <div class="row no-gutters text-center justify-content-center" style="margin-bottom: 17px;">
+        <div class="col-6">
+            <span class="badge badge-pill badge-primary" *ngFor="let p of user.musical_preferences">{{p}}</span>
+        </div>
+    </div>
+
 
   <div class="row no-gutters" style="text-align: center;margin-bottom: 27px;">
       <div class="col" style="text-align: right;margin-right: 23px;">

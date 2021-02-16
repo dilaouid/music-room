@@ -1,0 +1,193 @@
+<ion-content [scrollEvents]="true">
+
+  <div class="row no-gutters padMar" style="margin-bottom: 10px;">
+    <div class="col padMar">
+        <div class="input-group">
+            <div class="input-group-prepend"></div>
+            <input #searchUserValue class="form-control autocomplete" type="text" placeholder="Search for an user" style="background: rgba(17, 17, 17, 0.521);color: rgb(119,126,133);">
+            <div (click)='searchUser(searchUserValue.value)' class="input-group-append">
+              <button class="btn btn-dark" type="button"><i class="fa fa-search"></i></button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div id="profileTabFromUser" class="d-none">
+    <div class="row no-gutters text-center" style="margin-top: 25px;">
+      <div class="col">
+          <i (click)="returnToUserList()" class="fa fa-arrow-circle-left" style="position: absolute;color: rgb(255,255,255);font-size: 40px;opacity: 0.62;margin-left: -48px;margin-top: 41px;"></i>
+          <img class="rounded-circle" src="{{viewprofile.picture}}" style="width: 129px;">
+      </div>
+  </div>
+
+  <div class="row no-gutters text-center" style="margin-top: 25px;">
+    <div class="col" style="margin-bottom: -9px;">
+        <p>{{viewprofile.username}}<br>
+          <span *ngIf="viewprofile.mutual == true">{{viewprofile.firstname}} {{viewprofile.lastname}}<br></span><strong>{{viewprofile.followers.length}} followers</strong> | <strong>{{viewprofile.following.length}} following</strong></p>
+    </div>
+  </div>
+
+    <div class="row no-gutters text-center justify-content-center" style="margin-bottom: 17px;">
+        <div class="col-6">
+            <span class="badge badge-pill badge-primary" *ngFor="let p of viewprofile.musical_preferences">{{p}}</span>
+        </div>
+    </div>
+
+
+  <div *ngIf="viewprofile.me != true" class="row no-gutters" style="text-align: center;margin-bottom: 27px;">
+        <div class="col-12 text-center" style="text-align: right;margin-right: 23px;">
+            <button id="followBtn" *ngIf="viewprofile.you_follow == false" (click)="follow(viewprofile.uuid)" class="btn btn-info" type="button" style="border-radius: 32px;">Follow</button>
+            <button id="followBtn" *ngIf="viewprofile.you_follow == true"  (click)="follow(viewprofile.uuid)" class="btn btn-danger" type="button" style="border-radius: 32px;">Unfollow</button>
+        </div>
+  </div>
+
+  <ul class="nav nav-tabs nav-justified" role="tablist">
+      <li class="nav-item" role="presentation"><a class="nav-link active" role="tab" data-toggle="tab" href="#tab-1">Created playlists</a></li>
+      <li class="nav-item" role="presentation"><a class="nav-link" role="tab" data-toggle="tab" href="#tab-2">Liked tracks</a></li>
+  </ul>
+
+  <div class="tab-content">
+
+      <div class="tab-pane fade show active" role="tabpanel" id="tab-1">
+        
+            <!-- ========================== Loop through all your Playlists ========================== -->
+            <div *ngFor="let p of viewProfilPlaylists" class="row no-gutters align-items-center rowPlaylistItem" data-bs-hover-animate="pulse">
+              <div class="col-8" style="margin-left: 8px;margin-top: 11px;" (click)="playPlaylist(p._id, p.tracks.length)">
+                  <p style="font-size: 13px;color: var(--gray);"> 
+                      &nbsp;<ion-icon name="reader-outline"></ion-icon>&nbsp; <strong>{{p.name}}</strong><br>
+                      &nbsp;<ion-icon name="musical-notes-outline"></ion-icon>&nbsp; {{p.tracks.length}} track<span *ngIf="p.tracks.length > 1">s</span><br>
+                      &nbsp;<ion-icon name="heart-outline"></ion-icon>&nbsp; {{p.likes.length}}</p>
+              </div>
+              <div *ngIf="p.private == true" class="col-auto offset-4 text-right" style="margin-left: 8px;margin-top: 11px;">
+                  <p style="font-size: 13px;color: var(--gray);">
+                      <ion-icon name="lock-closed" style="font-size: 46px;opacity: 0.20;"></ion-icon>
+                  </p>
+              </div>
+              <!-- === END OF LOOP -->
+          </div>
+      </div>
+      <div class="tab-pane fade" role="tabpanel" id="tab-2">
+        
+            <!-- ========================== Loop through all your liked Tracks ========================== -->
+      <div *ngFor="let p of viewProfilLikedTracks; let i = index" class="row no-gutters align-items-center rowMusicItem" data-bs-hover-animate="pulse" (click)="playMusic(i)">
+          <div class="col-3">
+              <img *ngIf="p" src="{{p.cover}}" style="width: 83px;">
+          </div>
+          <div class="col-6" style="margin-top: 11px;" *ngIf="p">
+              <p style="font-size: 13px;color: var(--gray);"> <i class="fas fa-users"></i>
+              <strong > {{p.group}}</strong><br> 
+              <i class="fas fa-music"></i> 
+              <em> {{p.title}}</em><br> 
+              <i class="far fa-clock"></i> {{p.duration}}</p>
+          </div>
+          <div class="col-2 text-right" style="margin-top: 11px;" *ngIf="p">
+              <p style="font-size: 13px;color: var(--gray);"><i class="far fa-list-alt"></i> {{p.playlists.length}}</p>
+          </div>
+          
+            <!-- === END OF LOOP -->
+      </div>
+  </div>
+</div>
+  </div>
+
+  <!-- ========================== Audio Player for Track ========================== -->
+  <div id="listenToTrackFromUser" class="d-none">
+    <div class="player">
+        <div class="container">
+            <div class="icons">
+                <span (click)="returnToUserPage()"><ion-icon name="arrow-undo-outline"></ion-icon></span>
+                <h1>10H PlayeR</h1>
+                <span (click)="likeTrack()"><ion-icon [name]="playingTrack.liked ? 'heart' : 'heart-outline'"></ion-icon></span>
+            </div>
+            <div class="img">
+                <img src="{{playingTrack.cover}}">
+            </div>
+            <div class="title">
+                <h1>{{playingTrack.title}}</h1>
+                <p>{{playingTrack.group}}</p>
+            </div>
+            <div class="time">
+                00:00
+                <span></span>
+                00:30
+            </div>
+            <div class="seek">
+                <div class="fill"></div>
+            </div>
+        </div>
+        <div class="audio-btns">
+            <div class="play-btns">
+                <button class="vol decrease item" (click)="decreaseVolume()">-</button>
+                <span class="play-pause" (click)="togglePlay()"><ion-icon [name]="playIcon ? 'play' : 'pause'"></ion-icon></span>
+                <button class="vol increase item" (click)="increaseVolume()">+</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- ========================== Audio Player for Playlist ========================== -->
+  <div id="listenToPlaylistFromUser" class="d-none">
+    <div class="player">
+        <div class="container">
+            <div class="icons">
+                <span (click)="returnToUserPage()"><ion-icon name="arrow-undo-outline"></ion-icon></span>
+                <h1>{{listeningPlaylist.name}}</h1>
+            </div>
+
+            <div class="img">
+                <img src="{{playingTrack.cover}}">
+            </div>
+
+            <div class="title">
+                <h1>{{playingTrack.name}}</h1>
+                <p>{{playingTrack.group}}</p>
+            </div>
+
+            <div class="time">
+                00:00
+                <span></span>
+                00:30
+            </div>
+
+            <div class="seek">
+                <div class="fill"></div>
+            </div>
+
+        </div>
+        
+        <div class="audio-btns">
+
+            <div class="play-btns">
+                <span class="previous" (click)="previousSong()"><ion-icon name="play-skip-back"></ion-icon></span>
+                <span class="play-pause" (click)="togglePlay()"><ion-icon [name]="playIcon ? 'play' : 'pause'"></ion-icon></span>
+                <span class="next" (click)="nextSong()"><ion-icon name="play-skip-forward"></ion-icon></span>
+            </div>
+
+            <div class="repeat-btns">
+                <button class="decrease item" (click)="decreaseVolume()">-</button>
+                <span class="volume-up item"><ion-icon [name]="mutedSong ? 'volume-off' : 'volume-high'"></ion-icon></span>
+                <button class="increase item" (click)="increaseVolume()">+</button>
+            </div>
+
+        </div>
+    </div>
+  </div>
+
+  <div id="userlist">
+    <div *ngFor="let p of userList" class="row no-gutters align-items-center rowMusicItem" data-bs-hover-animate="pulse" (click)="openProfile(p)" style="width: 100vw;">
+      <div class="col-auto">
+          <img src="{{p.picture}}" style="width: 83px;">
+      </div>
+      <div class="col-auto" style="margin-left: 8px;margin-top: 11px;">
+          <p style="font-size: 13px;color: var(--gray);">&nbsp; <strong>{{p.username}}</strong><br>&nbsp; 
+            {{p.playlist.length > 0 ? p.playlist.length : 0}} <strong>playlists</strong><br>
+            &nbsp;&nbsp;{{p.followers.length}} <strong>followers</strong>
+          </p>
+      </div>
+      <div class="col-4" style="margin-left: 8px;margin-top: 11px;">
+          <span *ngFor="let x of p.musical_preferences" class="badge badge-pill badge-primary" style="margin-bottom: 5px;margin-right: 7px;font-size: 7px;">{{x}}</span>
+      </div>
+    </div>
+  </div>
+
+</ion-content>

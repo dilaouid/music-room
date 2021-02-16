@@ -12,28 +12,61 @@ function removeDuplicates(array) {
     return array.splice(0, array.length, ...(new Set(array)))
 };
 
-router.get('/', authentified, (req, res) => {
-    User.find( {}, {givenLikes: 0, admin: 0, oauthID: 0, password: 0, birthday: 0, hashtoken: 0, date: 0} ).then(async(user) => {
-        var usersList = [];
-        if (user) {
-            user.forEach(el => {
-                usersList.push({
-                    uuid: el._id,
-                    username: el.oauthID ? `${el.firstname} ${el.lastname}` : el.username,
-                    picture: el.img,
-                    description: el.description,
-                    playlist: el.playlists,
-                    following: el.following,
-                    followers: el.followers,
-                    events: el.events,
-                    musical_preferences: el.musical_preferences
+router.get('/', authentified, async (req, res) => {
+    const   search  = req.query.search;
+    const   token   = req.cookies.token;
+    var     infos   = await getInfos(token);
+    var     userid  = infos.id;
+    var     limit   = req.query.limit;
+    if (limit == undefined) { limit = 0; }
+    if (search != undefined) {
+        return await User.findOne({username: search}).then(us => {
+            if (us) {
+                var user = {
+                    uuid: us._id,
+                    username: us.oauthID ? `${us.firstname} ${us.lastname}` : us.username,
+                    picture: us.img,
+                    playlist: us.playlists,
+                    following: us.following,
+                    followers: us.followers,
+                    likes: us.givenLikes,
+                    events: us.events,
+                    musical_preferences: us.musical_preferences,
+                    mutual: us.followers.includes(userid) && us.following.includes(userid),
+                    you_follow: us.followers.includes(userid),
+                    me: us._id == userid
+                };
+                return res.json({statut: 200, data: user});
+            } else {
+                return res.json({statut: 404, res:'No user found'})
+            }
+        })
+    } else {
+        User.find( {}, {admin: 0, oauthID: 0, password: 0, birthday: 0, hashtoken: 0, date: 0}, {limit: parseInt(limit)} ).then(async(user) => {
+            var usersList = [];
+            if (user) {
+                user.forEach(el => {
+                    usersList.push({
+                        uuid: el._id,
+                        username: el.oauthID ? `${el.firstname} ${el.lastname}` : el.username,
+                        picture: el.img,
+                        playlist: el.playlists,
+                        following: el.following,
+                        followers: el.followers,
+                        events: el.events,
+                        likes: el.givenLikes,
+                        musical_preferences: el.musical_preferences,
+                        mutual: el.followers.includes(userid) && el.following.includes(userid),
+                        you_follow: el.followers.includes(userid),
+                        me: el._id == userid
+                    });
                 });
-            });
-            res.json({statut: 200, data: usersList});
-        } else {
-            res.json({statut: 404, res:'No users'})
-        }
-    });
+                res.json({statut: 200, data: usersList});
+            } else {
+                res.json({statut: 404, res:'No users'})
+            }
+        });
+    }
 });
 
 router.get('/valid-token', authentified, (req, res) => {
@@ -65,7 +98,8 @@ router.get('/me', authentified, async (req, res) => {
             followers: user.followers,
             likes: user.givenLikes,
             events: user.events,
-            musical_preferences: user.musical_preferences
+            musical_preferences: user.musical_preferences,
+            mutual: user.followers.includes(userid) && user.following.includes(userid)
         }});
     });
 });
@@ -97,8 +131,11 @@ router.get('/follow/:id', authentified, async (req, res) => {
     res.json({statut: 200, res: 'OK'});
 });
 
-router.get('/:id', authentified, (req, res) => {
-    const id = req.params.id;
+router.get('/:id', authentified, async (req, res) => {
+    const id   = req.params.id;
+    const token = req.cookies.token;
+    var infos  = await getInfos(token);
+    var userid = infos.id;
     User.findById( id ).then(async(user) => {
         if (user) {
             res.json({statut: 200, data:{
@@ -110,7 +147,8 @@ router.get('/:id', authentified, (req, res) => {
                 following: user.following,
                 followers: user.followers,
                 events: user.events,
-                musical_preferences: user.musical_preferences
+                musical_preferences: user.musical_preferences,
+                mutual: user.followers.includes(userid) && user.following.includes(userid)
             }});
         } else {
             res.json({statut: 400, res:'User not found'})

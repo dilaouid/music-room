@@ -59,6 +59,10 @@ const routes: Routes = [
         loadChildren: () => import('./profile/profile.module').then( m => m.ProfilePageModule)
       },
       {
+        path: 'users',
+        loadChildren: () => import('./users/users.module').then( m => m.UsersPageModule)
+      },
+      {
         path: '',
         redirectTo: '/tracks',
         pathMatch: 'full'
@@ -68,6 +72,10 @@ const routes: Routes = [
   {
     path: '',
     redirectTo: '/tracks'
+  },
+  {
+    path: 'users',
+    loadChildren: () => import('./users/users.module').then( m => m.UsersPageModule)
   },
   /* {
     path: 'login',

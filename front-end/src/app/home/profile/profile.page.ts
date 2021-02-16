@@ -166,7 +166,7 @@ export class ProfilePage implements OnInit {
     $('#tabsBtn').addClass('d-none');
     this.currentSong = 0;
     var listOfTracksIDs;
-    this.tracksToPlayPlaylistPage = await axios({url: `${environment.backEndUrl}/api/playlists/${id}`, method: 'get', withCredentials: true})
+    this.tracksToPlayPlaylistPage = await axios({url: `${environment.backEndUrl}/api/playlists/${id}?search=playlist`, method: 'get', withCredentials: true})
       .then(res => {
         this.listeningPlaylist = {id: res.data.data.uuid, name: res.data.data.title, admin:res.data.data.admin, admins: res.data.data.adminsUsername, private: res.data.data.private, liked: res.data.data.liked};
         listOfTracksIDs = res.data.data.tracks;

@@ -51,38 +51,56 @@ router.get('/me', authentified, async (req, res) => {
 });
 
 router.get('/:id', authentified, async (req, res) => {
-    const id = req.params.id;
-    const token = req.cookies.token;
-    const user = await getInfos(token);
-    Playlist.findById( id ).then(async(playlist) => {
-        if (playlist && ( (playlist.private == true && playlist.admins.includes(user.id)) || playlist.private == false) ) {
-            var adminsUsername = [];
-            for (let i = 0; i < playlist.admins.length; i++) {
-                await User.findById(playlist.admins[i]).then(us => {
-                    adminsUsername.push(us.username);
-                })
+    const id        = req.params.id;
+    const token     = req.cookies.token;
+    const user      = await getInfos(token);
+    const yourid    = user.id;
+    var playlistToShow = [];
+    const searchBy  = req.query.search;
+    if (searchBy == "playlist") {
+        Playlist.findById( id ).then(async(playlist) => {
+            if (playlist && ( (playlist.private == true && playlist.admins.includes(user.id)) || playlist.private == false) ) {
+                var adminsUsername = [];
+                for (let i = 0; i < playlist.admins.length; i++) {
+                    await User.findById(playlist.admins[i]).then(us => {
+                        adminsUsername.push(us.username);
+                    })
+                }
+                res.json({statut: 200, data:{
+                    title: playlist.name,
+                    uuid: playlist._id,
+                    admins: playlist.admins,
+                    adminsUsername: adminsUsername,
+                    tracks: playlist.tracks,
+                    likes: playlist.likes.length,
+                    events: playlist.inEvents,
+                    liked: playlist.likes.includes(user.id),
+                    admin: playlist.admins.includes(user.id),
+                    private: playlist.private
+                }});
+            } else if(playlist.private == true && !playlist.admins.includes(user.id)) {
+                res.json({statut: 403, res:'Access denied'})
+            } else {
+                res.json({statut: 404, res:'Playlist not found'})
             }
-            res.json({statut: 200, data:{
-                title: playlist.name,
-                uuid: playlist._id,
-                admins: playlist.admins,
-                adminsUsername: adminsUsername,
-                tracks: playlist.tracks,
-                likes: playlist.likes.length,
-                events: playlist.inEvents,
-                liked: playlist.likes.includes(user.id),
-                admin: playlist.admins.includes(user.id),
-                private: playlist.private
-            }});
-        } else if(playlist.private == true && !playlist.admins.includes(user.id)) {
-            res.json({statut: 403, res:'Access denied'})
-        } else {
-            res.json({statut: 404, res:'Playlist not found'})
-        }
-    }).catch(err => {
-        console.log(err)
-        return res.json({statut: 400, res:'Invalid id'});
-    });
+        }).catch(err => {
+            console.log(err)
+            return res.json({statut: 400, res:'Invalid id'});
+        });
+    } else if (searchBy == "user") {
+        await Playlist.find( {"admins": { $elemMatch: { $eq: id } }}, {date: 0} ).then(data => {
+            if (data) {
+                for (let i = 0; i < data.length; i++) {
+                    if ((data[i].private == true && data.admins.includes(yourid)) || data[i].private == false) {
+                        playlistToShow.push(data[i]);
+                    }
+                }
+                res.json({statut: 200, data: playlistToShow});
+            } else {
+                res.json({statut: 400, res:'No playlist'})
+            }
+        })
+    }
 });
 
 router.get('/delete/:id', authentified, async (req, res) => {
@@ -156,6 +174,7 @@ router.get('/add/:id/:track', authentified, async (req, res) => {
         res.json({statut: 200, res:'OK'});
     }
 });
+
 router.post('/update', urlencodedParser, authentified, async (req, res) => {
     const   token         = req.cookies.token;
     var     infos         = await getInfos(token);
